@@ -1,0 +1,205 @@
+<!--Saved by Quest 5.8.6836.13983-->
+<asl version="580">
+  <include ref="English.aslx" />
+  <include ref="Core.aslx" />
+  <game name="CrowdfundedMortgage">
+    <gameid>29b9a270-50ba-4aa5-954b-714bfbbb8d2e</gameid>
+    <version>1.0</version>
+    <firstpublished>2019</firstpublished>
+    <feature_asktell />
+    <showmoney type="boolean">false</showmoney>
+    <statusattributes type="stringdictionary">
+      <item>
+        <key>funds_needed</key>
+        <value></value>
+      </item>
+    </statusattributes>
+    <start type="script">
+      funds_needed = 100000
+    </start>
+    <funds type="int">0</funds>
+    <attr name="funds_needed" type="int">100000</attr>
+    <attr name="funds_raised" type="boolean">false</attr>
+    <attr name="time_cycle_count" type="int">5</attr>
+    <pov type="object">player</pov>
+    <roomenter type="script"><![CDATA[
+      if (game.time_cycle_count > 1) {
+        PrintCentered ("You have " + game.time_cycle_count + " minutes remaining")
+      }
+      else if (game.time_cycle_count = 1) {
+        PrintCentered ("You have " + game.time_cycle_count + " minute remaining. These are important people! We can't have you wasting their time")
+      }
+    ]]></roomenter>
+    <category>Surreal</category>
+  </game>
+  <object name="Central Hall">
+    <inherit name="editor_room" />
+    <usedefaultprefix type="boolean">false</usedefaultprefix>
+    <prefix>the</prefix>
+    <exit alias="west" to="Patio">
+      <inherit name="westdirection" />
+    </exit>
+    <exit alias="east" to="Gallery">
+      <inherit name="eastdirection" />
+    </exit>
+    <object name="player">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+    </object>
+    <object name="Steve">
+      <inherit name="editor_object" />
+      <inherit name="male" />
+      <ask type="scriptdictionary">
+        <item key="boat ship">
+          msg ("Thank you for asking me about that. I do love my ship")
+          player.funds = player.funds + 100000
+        </item>
+      </ask>
+      <thanked type="boolean">false</thanked>
+      <thank type="script">
+        if (GetBoolean(player, "funds_raised")) {
+          msg ("Steve says, \"It is my honor to sponsor a fellow voyager through the universe\"")
+          SetObjectFlagOn (Steve, "thanked")
+        }
+        else {
+          msg ("Steve looks confused, \"What for?\"")
+        }
+      </thank>
+      <tell type="scriptdictionary">
+        <item key="self">
+          msg ("Steve shifts his weight, and looks up. \"Ahhhhh where to begin. I received my first ship when I was twelve. I crossed the Atlantic the first time when I was 14. I learned everything I know from my father.\"")
+        </item>
+        <item key="finances">
+          tell_finance_topic (this)
+        </item>
+      </tell>
+      <look>Steve looks regal in his officer's uniform.</look>
+      <alias>Admiral Stevenerico Mostarpularious</alias>
+      <usedefaultprefix type="boolean">false</usedefaultprefix>
+      <prefix type="string"></prefix>
+    </object>
+    <object name="NoOne">
+      <inherit name="editor_object" />
+      <visible type="boolean">false</visible>
+    </object>
+  </object>
+  <object name="Gallery">
+    <inherit name="editor_room" />
+    <usedefaultprefix type="boolean">false</usedefaultprefix>
+    <prefix>the</prefix>
+    <exit alias="west" to="Central Hall">
+      <inherit name="westdirection" />
+    </exit>
+    <object name="Amand">
+      <inherit name="editor_object" />
+      <usedefaultprefix type="boolean">false</usedefaultprefix>
+      <alias>Socialite Amanderye Wischopillorhoffman</alias>
+    </object>
+  </object>
+  <object name="Patio">
+    <inherit name="editor_room" />
+    <usedefaultprefix type="boolean">false</usedefaultprefix>
+    <prefix>the</prefix>
+    <exit alias="east" to="Central Hall">
+      <inherit name="eastdirection" />
+    </exit>
+  </object>
+  <turnscript name="CheckForAmount">
+    <script><![CDATA[
+      if (player.funds >= player.funds_needed) {
+        ClearScreen
+        PrintCentered ("You raised enough funds. So long as you remain a productive member of the proletariat, you will live out the rest of your life in a home. This is a great honor, less than 5% of people have this opportunity. You should be grateful. Why don't you thank your sponsors now?")
+        SetObjectFlagOn (player, "funds_raised")
+        DisableTurnScript (CheckForAmount)
+        DisableTimer (time_cycle)
+        EnableTurnScript (CheckForThanks)
+      }
+      else {
+      }
+    ]]></script>
+    <enabled />
+  </turnscript>
+  <verb>
+    <property>leave</property>
+    <pattern>leave</pattern>
+    <defaultexpression>"You can't leave " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>thank</property>
+    <pattern>thank</pattern>
+    <defaultexpression>"You can't thank " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>timeleft</property>
+    <pattern>time left</pattern>
+    <defaultexpression>"You can't time left " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>time</property>
+    <pattern>time</pattern>
+    <defaultexpression>"You can't time " + object.article + "."</defaultexpression>
+  </verb>
+  <turnscript name="CheckForThanks">
+    <script>
+      if (GetBoolean(Steve, "thanked")) {
+        PrintCentered ("You are truly a good citizen. Your future family will speak of your brilliance for generations to come.")
+        finish
+      }
+    </script>
+    <enabled type="boolean">false</enabled>
+  </turnscript>
+  <function name="tell_finance_topic" parameters="funder">
+    set (player, "currently_talking_to", funder)
+    if (GetBoolean(funder, "tell_finance")) {
+      msg ("funder.alias + \"says, \\"You already talked to me about that.\\"\"")
+      funder.trust = funder.trust - 5
+    }
+    else {
+      ShowMenu ("What do you want to tell " + funder.alias + " about your finances", player.finance_topics, false) {
+        if (result = "how much money your parents have") {
+          if (player.currently_talking_to = Steve) {
+            msg ("He says, \"What a paltry sum! Your parents must not think highly of you if they only made that much.\"")
+          }
+        }
+      }
+    }
+    SetObjectFlagOn (funder, "tell_finance")
+  </function>
+  <walkthrough name="testing">
+    <steps type="simplestringlist">
+      tell Admiral Stevenerico Mostarpularious about finances
+    </steps>
+  </walkthrough>
+  <timer name="time_cycle">
+    <interval>60</interval>
+    <script><![CDATA[
+      SetTimerInterval (time_cycle, 60)
+      if (game.time_cycle_count > 1) {
+        game.time_cycle_count = game.time_cycle_count - 1
+        PrintCentered ("You have " + game.time_cycle_count + " minutes remaining")
+      }
+      else if (game.time_cycle_count = 1) {
+        game.time_cycle_count = game.time_cycle_count - 1
+        PrintCentered ("You have " + game.time_cycle_count + " minute remaining. These are important people! We can't have you wasting their time")
+      }
+      else if (game.time_cycle_count = 0) {
+        DisableTimer (time_cycle)
+        msg ("A bright light appears before you.")
+        SetTimeout (2) {
+        }
+        PrintCentered ("It appears you failed. No worries, we will simply take 95% of your pay in rent for the rest of your life. There is no shame in failing to own a home, many people go on to live successful lives without it. We remind you that you are still obligated to be a productive member of society.")
+        finish
+      }
+    ]]></script>
+    <enabled />
+  </timer>
+</asl>
