@@ -133,6 +133,11 @@
           msg ("You put your hands back down.")
         }
       ]]></punch>
+      <tell type="scriptdictionary">
+        <item key="your finances">
+          tell_finance_topic (this)
+        </item>
+      </tell>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -557,6 +562,7 @@
     set (fundee, "currently_talking_to", funder)
     if (GetBoolean(funder, "tell_finance")) {
       msg ("funder.alias + \"says, \\"You already talked to me about that.\\"\"")
+      trust_decrease_small (funder)
     }
     else {
       ShowMenu ("What do you want to tell " + funder.alias + " about your finances", fundee.finance_topics, false) {
@@ -566,8 +572,40 @@
           }
         }
         else if (result = "how frugal you are with your spending") {
-          msg ("\"Brilliant! I know a lot about being frugal. When you are on a ship for 180 days sailing around the world you have to pay close attention to every resource you have.\"")
-          trust_increase_small (Steve)
+          switch (fundee.currently_talking_to) {
+            case (Steve) {
+              msg ("\"Brilliant! I know a lot about being frugal. When you are on a ship for 180 days sailing around the world you have to pay close attention to every resource you have.\"")
+              trust_increase_medium (Steve)
+              if (ListContains(ScopeVisible(), Chrys)) {
+                trust_increase_small (Chrys)
+              }
+              if (ListContains(ScopeVisible(), Amand)) {
+                trust_decrease_large (Amand)
+              }
+            }
+            case (Chrys) {
+              msg ("\"That's good, I better make my money back and you better not spend it on things that are worthless.\"")
+              trust_increase_small (Chrys)
+              if (ListContains(ScopeVisible(), Steve)) {
+                trust_increase_small (Steve)
+              }
+              if (ListContains(ScopeVisible(), Amand)) {
+                trust_decrease_medium (Amand)
+              }
+            }
+            case (Amand) {
+              msg ("\"How uncouth, how can you LIVE like that? With that kind of attitude you simply don't BELONG in high society!\"")
+              trust_decrease_large (Amand)
+              if (ListContains(ScopeVisible(), Steve)) {
+                trust_increase_small (Steve)
+              }
+              if (ListContains(ScopeVisible(), Chrys)) {
+                trust_increase_small (Chrys)
+              }
+            }
+          }
+        }
+        else if (result = "how you make your credit payments early every month") {
         }
       }
     }
@@ -796,6 +834,21 @@
       go east
       go east
       punch Amand
+    </steps>
+  </walkthrough>
+  <walkthrough name="basic_funding_win">
+    <steps type="simplestringlist">
+      talk to The Queen
+      talk to The Queen
+      12345
+      wait
+      event:ShowMenuResponse;I am ready now
+      go west
+      introduce yourself to Steve
+      tell Steve about your finances
+      event:ShowMenuResponse;how frugal you are with your spending
+      ask Steve about his boat
+      tell Steve about your pitch
     </steps>
   </walkthrough>
   <timer name="time_cycle">
