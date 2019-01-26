@@ -133,11 +133,70 @@
           msg ("You put your hands back down.")
         }
       ]]></punch>
+      <thank type="script">
+        if (GetBoolean(fundee, "funds_raised")) {
+          msg ("\"Shine like a diamond, my darling\"")
+          Amand.thanked = true
+        }
+        else {
+          msg ("\"What for?\"")
+        }
+      </thank>
       <tell type="scriptdictionary">
         <item key="your finances">
           tell_finance_topic (this)
         </item>
+        <item key="your parents; your family">
+          firsttime {
+            msg ("\"While they did not have much, maybe they had love for you?\"")
+            trust_increase_small (this)
+            if (ListContains(ScopeVisible(), Chrys)) {
+              trust_decrease_medium (Chrys)
+            }
+            if (ListContains(ScopeVisible(), Steve)) {
+              trust_increase_medium (Steve)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="your pitch">
+          funding_pitch (this)
+        </item>
       </tell>
+      <ask type="scriptdictionary">
+        <item key="gems jewelry diamonds rubies">
+          firsttime {
+            msg ("\"Oh these? Gorgeous aren't they? My husband gave them to be as a half-year anniversary of our wedding. Don't you think they bring out my eyes?\"")
+            trust_increase_large (this)
+            if (ListContains(ScopeVisible(), Chrys)) {
+              trust_decrease_small (Chrys)
+            }
+            if (ListContains(ScopeVisible(), Steve)) {
+              trust_increase_small (Steve)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="family parents">
+          firsttime {
+            msg ("\"Truly, our families are our bedrocks. Without them, we would not be where we are today\"")
+            trust_increase_medium (this)
+            if (ListContains(ScopeVisible(), Chrys)) {
+              trust_decrease_medium (Chrys)
+            }
+            if (ListContains(ScopeVisible(), Steve)) {
+              trust_increase_medium (Steve)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+      </ask>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -227,6 +286,85 @@
           msg ("You put your hands back down.")
         }
       ]]></punch>
+      <thank type="script">
+        if (GetBoolean(fundee, "funds_raised")) {
+          msg ("\"You're a cool guy. Just be sure to pay me back.\"")
+          Chrys.thanked = true
+        }
+        else {
+          msg ("\"What for?\"")
+        }
+      </thank>
+      <ask type="scriptdictionary">
+        <item key="company">
+          firsttime {
+            msg ("\"I've got this great startup, and what we do is get game atheletes these shirts that flash a different ad every 8 seconds.")
+            trust_increase_large (this)
+            if (ListContains(ScopeVisible(), Steve)) {
+              trust_decrease_small (Steve)
+            }
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_decrease_large (Amand)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="investment investments">
+          firsttime {
+            msg ("\"I think this real estate investment is stupid. My dad says I have to DIVERSIFY my investments even if I make LESS money. DIVERSIFY? More like DiversiDUMB!\"")
+            trust_decrease_medium (this)
+            if (ListContains(ScopeVisible(), Steve)) {
+              trust_increase_small (Steve)
+            }
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_increase_medium (Amand)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="phone">
+          firsttime {
+            msg ("\"Yeah, my phone IS the latest model. It's not out yet, but I know a guy\"")
+            trust_increase_large (this)
+            if (ListContains(ScopeVisible(), Steve)) {
+              trust_decrease_small (Steve)
+            }
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_decrease_medium (Amand)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="watch">
+          firsttime {
+            msg ("\"My watch doesn't show the time, it uses vibrations to continually send the current time to my brain.\"")
+            trust_increase_large (this)
+            if (ListContains(ScopeVisible(), Steve)) {
+              trust_increase_small (Steve)
+            }
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_decrease_medium (Amand)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+      </ask>
+      <tell type="scriptdictionary">
+        <item key="your finances">
+          tell_finance_topic (this)
+        </item>
+        <item key="your pitch">
+          funding_pitch (this)
+        </item>
+      </tell>
     </object>
     <object name="Steve">
       <inherit name="editor_object" />
@@ -246,12 +384,12 @@
         invoke (this.image_rear)
       </look>
       <thank type="script">
-        if (GetBoolean(player, "funds_raised")) {
-          msg ("Steve says, \"It is my honor to sponsor a fellow voyager through the universe\"")
-          SetObjectFlagOn (Steve, "thanked")
+        if (GetBoolean(fundee, "funds_raised")) {
+          msg ("\"It is my honor to sponsor a fellow voyager through the universe\"")
+          Steve.thanked = true
         }
         else {
-          msg ("Steve looks confused, \"What for?\"")
+          msg ("\"What for?\"")
         }
       </thank>
       <punch type="script"><![CDATA[
@@ -285,18 +423,64 @@
         set (fundee, "currently_talking_to", fundee)
       </speak>
       <ask type="scriptdictionary">
-        <item key="his boat; his ship">
-          if (fundee.currently_talking_to = this) {
-            firsttime {
-              msg ("Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with")
-              trust_increase_large (this)
+        <item key="ship boat">
+          firsttime {
+            msg ("\"Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with the high sees and crashed it. My father was graciously forgiving about that.\"")
+            trust_increase_large (this)
+            if (ListContains(ScopeVisible(), Chrys)) {
+              trust_decrease_small (Chrys)
             }
-            otherwise {
-              already_talked (this)
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_increase_medium (Amand)
             }
           }
-          else {
-            PrintCentered ("You need to introduce yourself first.")
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="parents; father">
+          firsttime {
+            msg ("\"Ah yes, my father was a great man. He sailed the seas in a fleet of 32 ships, doing good all over the world. I can only hope to be like him.")
+            trust_increase_large (this)
+            if (ListContains(ScopeVisible(), Chrys)) {
+              trust_decrease_medium (Chrys)
+            }
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_increase_small (Amand)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="land; house; real estate">
+          firsttime {
+            msg ("\"What a worthless thing to talk about.\"")
+            trust_decrease_medium (this)
+            if (ListContains(ScopeVisible(), Chrys)) {
+              trust_decrease_small (Chrys)
+            }
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_increase_medium (Amand)
+            }
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+        <item key="atlantic pacific">
+          firsttime {
+            msg ("\"Ah, the Atlantic and the Pacific. Both of those seas are dangerous, but in different ways. the Atlantic, through the fierce storms, and the Pacific, through the immense size. You must treat each like an unruly subling, and learn how to anticipate their moves\"")
+            trust_increase_large (this)
+            if (ListContains(ScopeVisible(), Chrys)) {
+              trust_increase_small (Chrys)
+            }
+            if (ListContains(ScopeVisible(), Amand)) {
+              trust_decrease_small (Amand)
+            }
+          }
+          otherwise {
+            already_talked (this)
           }
         </item>
       </ask>
@@ -326,8 +510,6 @@
         </item>
         <item key="your pitch;">
           funding_pitch (this)
-        </item>
-        <item key="goodbye">
         </item>
       </tell>
     </object>
@@ -369,14 +551,12 @@
   <turnscript name="CheckForThanks">
     <enabled type="boolean">false</enabled>
     <script>
-      if (GetBoolean(Steve, "thanked")) {
-        PrintCentered ("You are truly a good citizen. Your future family will speak of your brilliance for generations to come.")
-        finish
-      }
       game.all_thanked = true
       foreach (funder, game.myTrueFunderList) {
-        if (funder.thanked = false) {
-          game.all_thanked = false
+        if (funder.gave_fund = true) {
+          if (funder.thanked = false) {
+            game.all_thanked = false
+          }
         }
       }
       if (game.all_thanked = true) {
@@ -567,8 +747,37 @@
     else {
       ShowMenu ("What do you want to tell " + funder.alias + " about your finances", fundee.finance_topics, false) {
         if (result = "how much money your parents have") {
-          if (fundee.currently_talking_to = Steve) {
-            msg ("He says, \"What a paltry sum! Your parents must not think highly of you if they only made that much.\"")
+          switch (fundee.currently_talking_to) {
+            case (Steve) {
+              msg ("\"That's a real shame, you can work on my boat if you need some extra dough to save up for a sailboat\"")
+              trust_increase_small (Steve)
+              if (ListContains(ScopeVisible(), Chrys)) {
+                trust_increase_large (Chrys)
+              }
+              if (ListContains(ScopeVisible(), Amand)) {
+                trust_decrease_small (Amand)
+              }
+            }
+            case (Chrys) {
+              msg ("\"Screw them, go make your own future!\"")
+              trust_increase_large (Chrys)
+              if (ListContains(ScopeVisible(), Steve)) {
+                trust_increase_small (Steve)
+              }
+              if (ListContains(ScopeVisible(), Amand)) {
+                trust_decrease_small (Amand)
+              }
+            }
+            case (Amand) {
+              msg ("\"Though you may not come from the best of stock, thank you for your confidence.\"")
+              trust_increase_small (Amand)
+              if (ListContains(ScopeVisible(), Steve)) {
+                trust_increase_small (Steve)
+              }
+              if (ListContains(ScopeVisible(), Chrys)) {
+                trust_increase_medium (Chrys)
+              }
+            }
           }
         }
         else if (result = "how frugal you are with your spending") {
@@ -606,6 +815,38 @@
           }
         }
         else if (result = "how you make your credit payments early every month") {
+          switch (fundee.currently_talking_to) {
+            case (Steve) {
+              msg ("\"But then how will you spend it on things that really matter?\"")
+              trust_decrease_medium (Steve)
+              if (ListContains(ScopeVisible(), Chrys)) {
+                trust_increase_medium (Chrys)
+              }
+              if (ListContains(ScopeVisible(), Amand)) {
+                trust_decrease_small (Amand)
+              }
+            }
+            case (Chrys) {
+              msg ("\"You're good. You may not make as much money as my crypto-farms, but maybe Dad was onto something here.\"")
+              trust_increase_medium (Chrys)
+              if (ListContains(ScopeVisible(), Steve)) {
+                trust_decrease_small (Steve)
+              }
+              if (ListContains(ScopeVisible(), Amand)) {
+                trust_decrease_medium (Amand)
+              }
+            }
+            case (Amand) {
+              msg ("\"Why do you WORRY so much?\"")
+              trust_decrease_small (Amand)
+              if (ListContains(ScopeVisible(), Steve)) {
+                trust_decrease_small (Steve)
+              }
+              if (ListContains(ScopeVisible(), Chrys)) {
+                trust_increase_medium (Chrys)
+              }
+            }
+          }
         }
       }
     }
@@ -671,7 +912,7 @@
         msg ("You give your best funding pitch to " + funder.article)
         msg ("Thankfully, " + funder.alias + " says, \"Alright, I can go in for that\"")
         funder.gave_fund = true
-        fundee.funds = funder.trust * 1000
+        fundee.funds = fundee.funds + funder.trust * 1000
       }
       else {
         msg ("Ugh, " + funder.gender + " grumbles. You're insufferable, you know that?")
@@ -729,7 +970,7 @@
   </function>
   <function name="trust_increase_large" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a lot more.")
-    funder.trust = funder.trust + 15
+    funder.trust = funder.trust + 20
   </function>
   <function name="trust_decrease_small" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a little less.")
@@ -755,9 +996,11 @@
       }
       msg ("You will be paying to the following [" + fundee.funders + "] funders.")
       foreach (funder, game.myTrueFunderList) {
-        msg ("\"Funder: \" + funder.alias")
+        if (funder.thanked = true) {
+          msg ("Funder: " + funder.alias)
+        }
       }
-      msg ("\"Your children after you will speak of you in their stories and legends. Prepare for your first step out of commonality and intro greatness\"")
+      msg ("\"Your children after you will speak of you in their stories and legends. Prepare for your first step out of commonality and into greatness\"")
       finish
     }
     else {
@@ -836,7 +1079,7 @@
       punch Amand
     </steps>
   </walkthrough>
-  <walkthrough name="basic_funding_win">
+  <walkthrough name="basic_funding_win_steve_amand">
     <steps type="simplestringlist">
       talk to The Queen
       talk to The Queen
@@ -848,7 +1091,76 @@
       tell Steve about your finances
       event:ShowMenuResponse;how frugal you are with your spending
       ask Steve about his boat
+      ask Steve about his father
+      ask Steve about the Atlantic ocean
       tell Steve about your pitch
+      go east
+      go east
+      ask Amand about her gems
+      ask Amand about her family
+      tell Amand about your finances
+      event:ShowMenuResponse;how much money your parents have
+      tell Amand about your family
+      tell Amand about your pitch
+      thank Amand
+      go west
+      go west
+      thank Steve
+    </steps>
+  </walkthrough>
+  <walkthrough name="basic_funding_win_steve_chrys">
+    <steps type="simplestringlist">
+      talk to The Queen
+      talk to The Queen
+      12345
+      wait
+      event:ShowMenuResponse;I am ready now
+      go west
+      introduce yourself to Steve
+      tell Steve about your finances
+      event:ShowMenuResponse;how frugal you are with your spending
+      ask Steve about his boat
+      ask Steve about his father
+      ask Steve about the Atlantic ocean
+      tell Steve about your pitch
+      ask Chrys about his company
+      ask Chrys about his investments
+      ask Chrys about his watch
+      ask Chrys about his phone
+      tell Chrys about your finances
+      event:ShowMenuResponse;how you make your credit payments early every month
+      tell Chrys about your pitch
+      thank Chrys
+      thank Steve
+    </steps>
+  </walkthrough>
+  <walkthrough name="basic_funding_win_chrys_amand">
+    <steps type="simplestringlist">
+      talk to The Queen
+      talk to The Queen
+      12345
+      wait
+      event:ShowMenuResponse;I am ready now
+      go west
+      ask Chrys about his company
+      ask Chrys about his investments
+      ask Chrys about his watch
+      ask Chrys about his phone
+      tell Chrys about your finances
+      event:ShowMenuResponse;how you make your credit payments early every month
+      tell Chrys about your pitch
+      go east
+      go east
+      ask Amand about her gems
+      ask Amand about her family
+      tell Amand about your finances
+      event:ShowMenuResponse;how much money your parents have
+      tell Amand about your family
+      tell Amand about your pitch
+      thank Amand
+      go west
+      go west
+      thank Chrys
     </steps>
   </walkthrough>
   <timer name="time_cycle">
