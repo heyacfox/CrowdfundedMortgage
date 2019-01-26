@@ -31,15 +31,17 @@
     </start>
     <roomenter type="script">
     </roomenter>
+    <attr name="time_cycle_count_start" type="int">5</attr>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
     <usedefaultprefix type="boolean">false</usedefaultprefix>
     <prefix>the</prefix>
     <firstenter type="script">
-      PrintCentered ("You have 5 minutes remaining. Good luck!")
+      game.time_cycle_count = game.time_cycle_count_start
+      PrintCentered ("You have " + game.time_cycle_count + " minutes remaining. Good luck!")
       EnableTimer (time_cycle)
-      EnableTimer (steve_moving)
+      all_moves
     </firstenter>
     <exit alias="west" to="Patio">
       <inherit name="westdirection" />
@@ -51,9 +53,6 @@
       <inherit name="editor_object" />
       <inherit name="male" />
       <thanked type="boolean">false</thanked>
-      <look type="script">
-        invoke (this.image_rear)
-      </look>
       <alias>Admiral Stevenerico Mostarpularious</alias>
       <usedefaultprefix type="boolean">false</usedefaultprefix>
       <prefix type="string"></prefix>
@@ -62,6 +61,11 @@
         <value>Speak to</value>
         <value>Introduce yourself to</value>
       </displayverbs>
+      <trust type="int">0</trust>
+      <attr name="gave_fund" type="boolean">false</attr>
+      <look type="script">
+        invoke (this.image_rear)
+      </look>
       <thank type="script">
         if (GetBoolean(player, "funds_raised")) {
           msg ("Steve says, \"It is my honor to sponsor a fellow voyager through the universe\"")
@@ -86,6 +90,12 @@
         msg (this.alias + " says, ahoy " + fundee.worker_id + "!")
         set (fundee, "currently_talking_to", this)
       </introduceyourselfto>
+      <attr name="image_front" type="script">
+        picture ("Steve_front.PNG")
+      </attr>
+      <attr name="image_rear" type="script">
+        picture ("Steve_rear.PNG")
+      </attr>
       <ask type="scriptdictionary">
         <item key="boat ship">
           firsttime {
@@ -108,14 +118,6 @@
           funding_pitch (this)
         </item>
       </tell>
-      <trust type="int">0</trust>
-      <attr name="gave_fund" type="boolean">false</attr>
-      <attr name="image_front" type="script">
-        picture ("Steve_front.PNG")
-      </attr>
-      <attr name="image_rear" type="script">
-        picture ("Steve_rear.PNG")
-      </attr>
     </object>
     <object name="NoOne">
       <inherit name="editor_object" />
@@ -154,30 +156,6 @@
       <drop type="boolean">false</drop>
       <look>This is obviously a glove that you can wear, but it has no weight. It looks like the graphics are missing.</look>
     </object>
-    <object name="fundee">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-      <alias>fundee</alias>
-      <statusattributes type="stringdictionary">
-        <item>
-          <key>funds</key>
-          <value></value>
-        </item>
-        <item>
-          <key>funds_needed</key>
-          <value></value>
-        </item>
-      </statusattributes>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
-    </object>
   </object>
   <object name="Gallery">
     <inherit name="editor_room" />
@@ -193,6 +171,12 @@
       <alias>Socialite Amanderye Wischopillorhoffman</alias>
       <trust type="int">0</trust>
       <attr name="gave_fund" type="boolean">false</attr>
+      <attr name="image_front" type="script">
+        picture ("Amand_front.PNG")
+      </attr>
+      <attr name="image_rear" type="script">
+        picture ("Amand_rear.PNG")
+      </attr>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -264,6 +248,12 @@
       <look>Genius Chrysteravegnar Poppylivoginowrbt looks distracted by all his devices. Each one buzzes at seemingly random intervals. </look>
       <trust type="int">0</trust>
       <attr name="gave_fund" type="boolean">false</attr>
+      <attr name="image_front" type="script">
+        picture ("Chrys_front.PNG")
+      </attr>
+      <attr name="image_rear" type="script">
+        picture ("Chrys_rear.PNG")
+      </attr>
     </object>
   </object>
   <turnscript name="CheckForAmount">
@@ -414,10 +404,43 @@
           }
         }
       </speak>
+      <intro_questions type="stringlist">
+        <value>Why am I here?</value>
+        <value>How does this work?</value>
+        <value>What should I ask the funders?</value>
+        <value>Where will I meet the funders?</value>
+        <value>Who will my funders be?</value>
+        <value>I am ready now</value>
+      </intro_questions>
     </object>
-    <exit alias="out" to="Central Hall">
+    <exit name="void_exit" alias="out" to="Central Hall">
       <inherit name="outdirection" />
+      <visible type="boolean">false</visible>
     </exit>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
+    </object>
   </object>
   <turnscript name="id_check">
     <enabled />
@@ -477,7 +500,36 @@
     }
   ]]></function>
   <function name="queen_questions">
-    PrintCentered ("I am here to answer any of  your questions. My hive has an infinite amount of time to spend with you to prepare you for this event.")
+    firsttime {
+      PrintCentered ("I am here to answer any of  your questions. My hive has an infinite amount of time to spend with you to prepare you for this event.")
+      queen_questions
+    }
+    otherwise {
+      ShowMenu ("", queen_intro.intro_questions, true) {
+        switch (result) {
+          case (Why am I here?) {
+            PrintCentered ("You are here because you have a once in a lifetime opportunity. You began your life poor, but you have the chance to obtain a 60 year mortgage to own a home.")
+          }
+          case (What should I ask the funders?) {
+            PrintCentered ("I would recommend you INTRODUCE YOURSELF TO them. Then, you might want ASK them about himself/herself. That will bring up a number of topics you could discuss with them. Lastly, you might consider to TELL them about your family, finances, or anything else that will show them you are trustworthy to invest in.")
+          }
+          case (How does this work?) {
+          }
+          case (Where will I meet the funders?) {
+          }
+          case (Who will my funders be?) {
+          }
+          case (I am ready now) {
+            MoveObject (fundee, Central Hall)
+          }
+          default {
+            if (game.pov.parent = queen_void) {
+              queen_questions
+            }
+          }
+        }
+      }
+    }
   </function>
   <function name="print_funder_list">
     foreach (funder, myFunderList) {
@@ -509,12 +561,66 @@
       PrintCentered ("You already gave your pitch to " + funder.gender + ", try asking someone else")
     }
   ]]></function>
-  <function name="change_room" parameters="funder, room">
-    MoveObject (funder, room)
-    if (game.pov.parent = room) {
-      msg (funder.alias + " enters " + room.alias)
-      invoke (funder.image_rear)
+  <function name="change_room" parameters="funder, room"><![CDATA[
+    if (game.pov.parent = funder.parent) {
+      msg (funder.alias + " leaves the room.")
     }
+    if (fundee.currently_talking_to <> funder) {
+      MoveObject (funder, room)
+      if (game.pov.parent = room) {
+        msg (funder.alias + " enters " + room.alias)
+        invoke (funder.image_rear)
+      }
+    }
+  ]]></function>
+  <function name="all_moves">
+    SetTimeout (game.time_cycle_count_start * 60 *  1 / 12) {
+      change_room (Steve, Patio)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  2 / 12) {
+      change_room (Amand, Central Hall)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  3 / 12) {
+      change_room (Chrys, Central Hall)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  4 / 12) {
+      change_room (Chrys, Gallery)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  5 / 12) {
+      change_room (Chrys, Gallery)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  7 / 12) {
+      change_room (Amand, Gallery)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  8 / 12) {
+      change_room (Steve, Patio)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  9 / 12) {
+      change_room (Chrys, Central Hall)
+    }
+    SetTimeout (game.time_cycle_count_start * 60 *  10 / 12) {
+      change_room (Steve, Patio)
+    }
+  </function>
+  <function name="trust_increase_medium">
+    msg (funder.alias + " looks like " + funder.gender + " trusts you more.")
+    funder.trust = funder.trust + 10
+  </function>
+  <function name="trust_increase_large">
+    msg (funder.alias + " looks like " + funder.gender + " trusts you a lot more.")
+    funder.trust = funder.trust + 15
+  </function>
+  <function name="trust_decrease_small">
+    msg (funder.alias + " looks like " + funder.gender + " trusts you a little less.")
+    funder.trust = funder.trust - 5
+  </function>
+  <function name="trust_decrease_medium">
+    msg (funder.alias + " looks like " + funder.gender + " trusts you a less.")
+    funder.trust = funder.trust - 10
+  </function>
+  <function name="trust_decrease_large">
+    msg (funder.alias + " looks like " + funder.gender + " trusts you a lot less.")
+    funder.trust = funder.trust - 15
   </function>
   <walkthrough name="testing">
     <steps type="simplestringlist">
@@ -551,6 +657,14 @@
       tell Steve about your pitch
     </steps>
   </walkthrough>
+  <walkthrough name="void_test">
+    <steps type="simplestringlist">
+      talk to The Queen
+      talk to The Queen
+      142394
+      wait
+    </steps>
+  </walkthrough>
   <timer name="time_cycle">
     <interval>60</interval>
     <enabled />
@@ -575,10 +689,9 @@
     ]]></script>
   </timer>
   <timer name="steve_moving">
-    <interval>75</interval>
+    <interval>1</interval>
     <enabled type="boolean">false</enabled>
     <script>
-      change_room (Steve, Patio)
     </script>
   </timer>
 </asl>
