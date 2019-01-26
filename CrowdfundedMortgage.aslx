@@ -2,69 +2,66 @@
 <asl version="580">
   <include ref="English.aslx" />
   <include ref="Core.aslx" />
-  <game name="CrowdfundedMortgage">
+  <game name="The Five Minute Mortgage">
     <gameid>29b9a270-50ba-4aa5-954b-714bfbbb8d2e</gameid>
     <version>1.0</version>
     <firstpublished>2019</firstpublished>
     <feature_asktell />
     <showmoney type="boolean">false</showmoney>
-    <statusattributes type="stringdictionary">
-      <item>
-        <key>funds_needed</key>
-        <value></value>
-      </item>
-    </statusattributes>
-    <start type="script">
-      funds_needed = 100000
-    </start>
+    <statusattributes type="stringdictionary" />
     <funds type="int">0</funds>
     <attr name="funds_needed" type="int">100000</attr>
     <attr name="funds_raised" type="boolean">false</attr>
     <attr name="time_cycle_count" type="int">5</attr>
-    <pov type="object">player</pov>
-    <roomenter type="script"><![CDATA[
-      if (game.time_cycle_count > 1) {
-        PrintCentered ("You have " + game.time_cycle_count + " minutes remaining")
-      }
-      else if (game.time_cycle_count = 1) {
-        PrintCentered ("You have " + game.time_cycle_count + " minute remaining. These are important people! We can't have you wasting their time")
-      }
-    ]]></roomenter>
     <category>Surreal</category>
+    <enablehyperlinks type="boolean">false</enablehyperlinks>
+    <turnoffplacesandobjects />
+    <setcustompadding />
+    <custompaddingright type="int">10</custompaddingright>
+    <custompaddingleft type="int">10</custompaddingleft>
+    <setcustomwidth />
+    <customwidth type="int">1200</customwidth>
+    <pov type="object">fundee</pov>
+    <start type="script">
+      funds_needed = 100000
+      myFunderList = NewObjectList()
+      list add (myFunderList, Steve)
+      list add (myFunderList, Amand)
+      list add (myFunderList, Chrys)
+    </start>
+    <roomenter type="script">
+    </roomenter>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
     <usedefaultprefix type="boolean">false</usedefaultprefix>
     <prefix>the</prefix>
+    <firstenter type="script">
+      PrintCentered ("You have 5 minutes remaining. Good luck!")
+      EnableTimer (time_cycle)
+      EnableTimer (steve_moving)
+    </firstenter>
     <exit alias="west" to="Patio">
       <inherit name="westdirection" />
     </exit>
     <exit alias="east" to="Gallery">
       <inherit name="eastdirection" />
     </exit>
-    <object name="player">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-    </object>
     <object name="Steve">
       <inherit name="editor_object" />
       <inherit name="male" />
-      <ask type="scriptdictionary">
-        <item key="boat ship">
-          msg ("Thank you for asking me about that. I do love my ship")
-          player.funds = player.funds + 100000
-        </item>
-      </ask>
       <thanked type="boolean">false</thanked>
+      <look type="script">
+        invoke (this.image_rear)
+      </look>
+      <alias>Admiral Stevenerico Mostarpularious</alias>
+      <usedefaultprefix type="boolean">false</usedefaultprefix>
+      <prefix type="string"></prefix>
+      <displayverbs type="stringlist">
+        <value>Look at</value>
+        <value>Speak to</value>
+        <value>Introduce yourself to</value>
+      </displayverbs>
       <thank type="script">
         if (GetBoolean(player, "funds_raised")) {
           msg ("Steve says, \"It is my honor to sponsor a fellow voyager through the universe\"")
@@ -74,6 +71,32 @@
           msg ("Steve looks confused, \"What for?\"")
         }
       </thank>
+      <punch type="script"><![CDATA[
+        if (GetOuter("hand") <> null) {
+          msg ("You punch through Steve. He is no longer here.")
+        }
+        else {
+          msg ("You put your dukes up and wind up for a big punch.")
+          PrintCentered ("I'm pretty sure you don't want to do that.")
+          msg ("You put your hands back down.")
+        }
+      ]]></punch>
+      <introduceyourselfto type="script">
+        picture ("Steve_front.PNG")
+        msg (this.alias + " says, ahoy " + fundee.worker_id + "!")
+        set (fundee, "currently_talking_to", this)
+      </introduceyourselfto>
+      <ask type="scriptdictionary">
+        <item key="boat ship">
+          firsttime {
+            msg ("Thank you for asking me about that. I do love my ship. when I first sailed the seas")
+            this.trust = this.trust + 10
+          }
+          otherwise {
+            already_talked (this)
+          }
+        </item>
+      </ask>
       <tell type="scriptdictionary">
         <item key="self">
           msg ("Steve shifts his weight, and looks up. \"Ahhhhh where to begin. I received my first ship when I was twelve. I crossed the Atlantic the first time when I was 14. I learned everything I know from my father.\"")
@@ -81,15 +104,79 @@
         <item key="finances">
           tell_finance_topic (this)
         </item>
+        <item key="your pitch;">
+          funding_pitch (this)
+        </item>
       </tell>
-      <look>Steve looks regal in his officer's uniform.</look>
-      <alias>Admiral Stevenerico Mostarpularious</alias>
-      <usedefaultprefix type="boolean">false</usedefaultprefix>
-      <prefix type="string"></prefix>
+      <trust type="int">0</trust>
+      <attr name="gave_fund" type="boolean">false</attr>
+      <attr name="image_front" type="script">
+        picture ("Steve_front.PNG")
+      </attr>
+      <attr name="image_rear" type="script">
+        picture ("Steve_rear.PNG")
+      </attr>
     </object>
     <object name="NoOne">
       <inherit name="editor_object" />
       <visible type="boolean">false</visible>
+    </object>
+    <object name="Vase">
+      <inherit name="editor_object" />
+      <feature_container />
+      <usestandardverblist />
+      <grasb type="script">
+        MakeObjectVisible (Fist)
+        AddToInventory (Fist)
+      </grasb>
+      <admire type="script">
+        msg ("You admire the vase, taking in the eloquent design.")
+      </admire>
+      <lift type="script">
+        msg ("You lift the vase, revealing something underneath.")
+        msg ("The vase is very heavy, so you set it back down.")
+      </lift>
+    </object>
+    <object name="Fist">
+      <inherit name="editor_object" />
+      <inherit name="wearable" />
+      <alias>Fist of Vengeance</alias>
+      <visible type="boolean">false</visible>
+      <take />
+      <feature_wearable />
+      <wear_slots type="stringlist">
+        <value>hand</value>
+      </wear_slots>
+      <wearmsg>You put on the Fist of Vengeance</wearmsg>
+      <removemsg>You can't seem to take off the Fist of Vengeance</removemsg>
+      <listalias>Fist of Vengeance</listalias>
+      <takemsg>You are given the Fist of Vengeance</takemsg>
+      <drop type="boolean">false</drop>
+      <look>This is obviously a glove that you can wear, but it has no weight. It looks like the graphics are missing.</look>
+    </object>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
     </object>
   </object>
   <object name="Gallery">
@@ -101,24 +188,90 @@
     </exit>
     <object name="Amand">
       <inherit name="editor_object" />
+      <inherit name="namedfemale" />
       <usedefaultprefix type="boolean">false</usedefaultprefix>
       <alias>Socialite Amanderye Wischopillorhoffman</alias>
+      <trust type="int">0</trust>
+      <attr name="gave_fund" type="boolean">false</attr>
+    </object>
+    <object name="portrait">
+      <inherit name="editor_object" />
+      <alias>Beautiful Portrait Painting</alias>
+      <usestandardverblist />
+      <takemsg>You try to pull it off the wall but it disappears, revealing something.</takemsg>
+      <take />
+      <ontake type="script">
+        MakeObjectInvisible (portrait)
+        picture ("VaseDetail2.png")
+      </ontake>
+    </object>
+    <object name="landscape">
+      <inherit name="editor_object" />
+      <alias>Beautiful Landscape Painting</alias>
+      <take />
+      <takemsg>You try to take it off the wall but it disappears, revealing something</takemsg>
+      <usestandardverblist />
+      <ontake type="script">
+        MakeObjectInvisible (landscape)
+        picture ("intro_detail.png")
+      </ontake>
+    </object>
+    <object name="abstract">
+      <inherit name="editor_object" />
+      <alias>Beautiful Abstract Painting</alias>
+      <attr name="feature_switchable" type="boolean">false</attr>
+      <take />
+      <takemsg>You try to pull it off the wall but it disappears, revealing something.</takemsg>
+      <usestandardverblist />
+      <ontake type="script">
+        MakeObjectInvisible (abstract)
+      </ontake>
     </object>
   </object>
   <object name="Patio">
     <inherit name="editor_room" />
     <usedefaultprefix type="boolean">false</usedefaultprefix>
     <prefix>the</prefix>
+    <description>The mahogany floors creek gently under your feet. There is an exquisitely detailed railing with maple leaf flourishes. Out beyond the railing you can see the ocean. </description>
+    <descprefix>You go to the</descprefix>
     <exit alias="east" to="Central Hall">
       <inherit name="eastdirection" />
     </exit>
+    <exit name="debug_path" alias="west" to="Debug">
+      <inherit name="westdirection" />
+      <locked type="boolean">false</locked>
+      <visible type="boolean">false</visible>
+      <lockmessage type="string"></lockmessage>
+    </exit>
+    <object name="ocean">
+      <inherit name="editor_object" />
+      <alias>The Ocean</alias>
+      <scenery />
+      <punch type="script"><![CDATA[
+        if (GetOuter("hand") <> null) {
+          msg ("You punch the ocean. It looks like there is a room behind where the ocean used to be.")
+          MakeExitVisible (debug_path)
+        }
+        else {
+          PrintCentered ("What makes you think that can be punched?")
+        }
+      ]]></punch>
+    </object>
+    <object name="Chrys">
+      <inherit name="editor_object" />
+      <inherit name="namedmale" />
+      <alias>Genius Chrysteravegnar Poppylivoginowrbt</alias>
+      <look>Genius Chrysteravegnar Poppylivoginowrbt looks distracted by all his devices. Each one buzzes at seemingly random intervals. </look>
+      <trust type="int">0</trust>
+      <attr name="gave_fund" type="boolean">false</attr>
+    </object>
   </object>
   <turnscript name="CheckForAmount">
+    <enabled />
     <script><![CDATA[
-      if (player.funds >= player.funds_needed) {
-        ClearScreen
-        PrintCentered ("You raised enough funds. So long as you remain a productive member of the proletariat, you will live out the rest of your life in a home. This is a great honor, less than 5% of people have this opportunity. You should be grateful. Why don't you thank your sponsors now?")
-        SetObjectFlagOn (player, "funds_raised")
+      if (fundee.funds >= fundee.funds_needed) {
+        PrintCentered ("You raised enough funds. So long as you remain a productive member of the proletariat, you will live out the rest of your life in a home that you will own after 60 years working. This is a great honor, less than 5% of people have this opportunity. You should be grateful. Why don't you thank your sponsors now?")
+        SetObjectFlagOn (fundee, "funds_raised")
         DisableTurnScript (CheckForAmount)
         DisableTimer (time_cycle)
         EnableTurnScript (CheckForThanks)
@@ -126,7 +279,6 @@
       else {
       }
     ]]></script>
-    <enabled />
   </turnscript>
   <verb>
     <property>leave</property>
@@ -149,38 +301,259 @@
     <defaultexpression>"You can't time " + object.article + "."</defaultexpression>
   </verb>
   <turnscript name="CheckForThanks">
+    <enabled type="boolean">false</enabled>
     <script>
       if (GetBoolean(Steve, "thanked")) {
         PrintCentered ("You are truly a good citizen. Your future family will speak of your brilliance for generations to come.")
         finish
       }
+      foreach (funder, myFunderList) {
+      }
     </script>
-    <enabled type="boolean">false</enabled>
   </turnscript>
+  <object name="Debug">
+    <inherit name="editor_room" />
+    <descprefix type="string"></descprefix>
+    <description>NOTE: IF YOU ARE HERE THEN THIS IS A DEV BUILD. GREP HAS THE LIST OF DEBUG COMMANDS YOU CAN USE WHILE YOU ARE IN HERE.</description>
+    <exit alias="east" to="Patio">
+      <inherit name="eastdirection" />
+      <locked type="boolean">false</locked>
+      <lockmessage type="string"></lockmessage>
+      <visible />
+      <runscript type="boolean">false</runscript>
+    </exit>
+    <object name="queen">
+      <inherit name="editor_object" />
+      <inherit name="namedfemale" />
+      <alias>The Queen</alias>
+      <scenery type="boolean">false</scenery>
+      <usestandardverblist />
+      <look>The Queen exists but cannot be seen.</look>
+      <visible />
+      <usedefaultprefix type="boolean">false</usedefaultprefix>
+      <gender>they</gender>
+      <article>them</article>
+      <possessive>theirs</possessive>
+      <ask type="scriptdictionary">
+        <item key="love">
+          foreach (, ) {
+            PrintCentered ("DEBUG: ALL FUNDER TRUST AT MAX")
+          }
+        </item>
+        <item key="hate">
+          PrintCentered ("DEBUG: ALL FUNDER TRUST AT MINIMUM")
+        </item>
+        <item key="being rich">
+          PrintCentered ("DEBUG: FUNDS SET TO EXACT AMOUNT")
+          fundee.funds = fundee.funds_needed
+        </item>
+      </ask>
+    </object>
+  </object>
+  <verb>
+    <property>grasb</property>
+    <pattern>grasb</pattern>
+    <defaultexpression>"You can't grasb " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>admire</property>
+    <pattern>admire</pattern>
+    <defaultexpression>"You can't admire " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>punch</property>
+    <pattern>punch</pattern>
+    <defaultexpression>"You can't punch " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>grab</property>
+    <pattern>grab</pattern>
+    <defaultexpression>"You can't grab " + object.article + "."</defaultexpression>
+  </verb>
+  <object name="apartment">
+    <inherit name="editor_room" />
+    <firstenter type="script">
+      msg ("You take off the VR headset. Your text pager receives a ping.")
+      if (fundee.hack_win) {
+        PrintCentered ("Congratulations! Your mortgage has been financed by:")
+        if (funder.thanked) {
+          print_funder_list
+        }
+        PrintCentered ("Your payments to these individuals will begin on [" + queen.initial_payment_date + "]")
+      }
+    </firstenter>
+    <object name="vr_headset">
+      <inherit name="editor_object" />
+      <inherit name="wearable" />
+      <alias>VR Headset</alias>
+      <feature_wearable />
+      <wear_slots type="stringlist">
+        <value>head</value>
+      </wear_slots>
+    </object>
+  </object>
+  <object name="queen_void">
+    <inherit name="editor_room" />
+    <object name="queen_intro">
+      <inherit name="editor_object" />
+      <inherit name="namedfemale" />
+      <alias>The Queen</alias>
+      <gender>they</gender>
+      <article>them</article>
+      <possessive>theirs</possessive>
+      <speak type="script">
+        PrintCentered ("Hello productive member of society")
+        firsttime {
+          PrintCentered (fundee.worker_id.value + ", I am glad you decided you are up for this challenge. This is not something to be taken lightly")
+        }
+        otherwise {
+          PrintCentered ("ENTER WORKER ID")
+          get input {
+            set (fundee, "worker_id", result)
+            PrintCentered ("Thank you, please wait a moment while I connect to HIVE to verify your information.")
+          }
+        }
+      </speak>
+    </object>
+    <exit alias="out" to="Central Hall">
+      <inherit name="outdirection" />
+    </exit>
+  </object>
+  <turnscript name="id_check">
+    <enabled />
+    <script><![CDATA[
+      if (fundee.worker_id <> null) {
+        queen_questions
+        DisableTurnScript (id_check)
+      }
+    ]]></script>
+  </turnscript>
+  <verb>
+    <property>introduce</property>
+    <pattern>introduce</pattern>
+    <defaultexpression>"You can't introduce " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>introduceyourself</property>
+    <pattern>introduce yourself;</pattern>
+    <defaultexpression>"You can't introduce yourself; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>introduceyourselfto</property>
+    <pattern>introduce yourself to;</pattern>
+    <defaultexpression>"You can't introduce yourself to; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>lift</property>
+    <pattern>lift</pattern>
+    <defaultexpression>"You can't lift " + object.article + "."</defaultexpression>
+  </verb>
   <function name="tell_finance_topic" parameters="funder">
-    set (player, "currently_talking_to", funder)
+    set (fundee, "currently_talking_to", funder)
     if (GetBoolean(funder, "tell_finance")) {
       msg ("funder.alias + \"says, \\"You already talked to me about that.\\"\"")
-      funder.trust = funder.trust - 5
     }
     else {
-      ShowMenu ("What do you want to tell " + funder.alias + " about your finances", player.finance_topics, false) {
+      ShowMenu ("What do you want to tell " + funder.alias + " about your finances", fundee.finance_topics, false) {
         if (result = "how much money your parents have") {
-          if (player.currently_talking_to = Steve) {
+          if (fundee.currently_talking_to = Steve) {
             msg ("He says, \"What a paltry sum! Your parents must not think highly of you if they only made that much.\"")
           }
+        }
+        else if (result = "how frugal you are with your spending") {
+          msg ("\"Brilliant! I know a lot about being frugal. When you are on a ship for 180 days sailing around the world you have to pay close attention to every resource you have.\"")
+          trust_increase_small (Steve)
         }
       }
     }
     SetObjectFlagOn (funder, "tell_finance")
   </function>
+  <function name="funding_request" parameters="funder"><![CDATA[
+    if (funder.trust > 0) {
+      msg ("Give Funding")
+    }
+    else {
+      msg ("Absolutely not.")
+    }
+  ]]></function>
+  <function name="queen_questions">
+    PrintCentered ("I am here to answer any of  your questions. My hive has an infinite amount of time to spend with you to prepare you for this event.")
+  </function>
+  <function name="print_funder_list">
+    foreach (funder, myFunderList) {
+      PrintCentered ("funder.alias")
+    }
+  </function>
+  <function name="already_talked" parameters="funder">
+    msg ("You see " + funder.gender + " looks disgruntled, \"I already talked to you about that.\"")
+    funder.trust = funder.trust - 5
+  </function>
+  <function name="trust_increase_small" parameters="funder">
+    msg (funder.alias + " looks like " + funder.gender + " trusts you a little more.")
+    funder.trust = funder.trust + 5
+  </function>
+  <function name="funding_pitch" parameters="funder"><![CDATA[
+    if (funder.gave_fund = false) {
+      if (funder.trust > 0) {
+        msg ("You give your best funding pitch to " + funder.article)
+        msg ("Thankfully, " + funder.alias + "says, \"Alright, I can go in for that\"")
+        funder.gave_fund = true
+        fundee.funds = funder.trust * 1000
+      }
+      else {
+        msg ("Ugh, " + funder.gender + " grumbles. You're insufferable, you know that?")
+        funder.gave_fund = true
+      }
+    }
+    else {
+      PrintCentered ("You already gave your pitch to " + funder.gender + ", try asking someone else")
+    }
+  ]]></function>
+  <function name="change_room" parameters="funder, room">
+    MoveObject (funder, room)
+    if (game.pov.parent = room) {
+      msg (funder.alias + " enters " + room.alias)
+      invoke (funder.image_rear)
+    }
+  </function>
   <walkthrough name="testing">
     <steps type="simplestringlist">
-      tell Admiral Stevenerico Mostarpularious about finances
+      grasb Vase
+      wear fist
+      punch Steve
+      go west
+      punch ocean
+    </steps>
+  </walkthrough>
+  <walkthrough name="steve_test">
+    <steps type="simplestringlist">
+      ask Steve about boat
+      ask Steve about boat
+    </steps>
+  </walkthrough>
+  <walkthrough name="central_win_hacking">
+    <steps type="simplestringlist">
+      grasb vase
+      wear fist
+      go west
+      punch ocean
+      go west
+      ask The Queen about being rich
+    </steps>
+  </walkthrough>
+  <walkthrough name="central_win_funding">
+    <steps type="simplestringlist">
+      introduce yourself to Steve
+      ask Steve about boat
+      ask Steve about family
+      tell Steve about finances
+      event:ShowMenuResponse;how frugal you are with your spending
+      tell Steve about your pitch
     </steps>
   </walkthrough>
   <timer name="time_cycle">
     <interval>60</interval>
+    <enabled />
     <script><![CDATA[
       SetTimerInterval (time_cycle, 60)
       if (game.time_cycle_count > 1) {
@@ -200,6 +573,12 @@
         finish
       }
     ]]></script>
-    <enabled />
+  </timer>
+  <timer name="steve_moving">
+    <interval>75</interval>
+    <enabled type="boolean">false</enabled>
+    <script>
+      change_room (Steve, Patio)
+    </script>
   </timer>
 </asl>
