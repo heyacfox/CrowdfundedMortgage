@@ -22,6 +22,15 @@
     <setcustomwidth />
     <customwidth type="int">1200</customwidth>
     <attr name="time_cycle_count_start" type="int">5</attr>
+    <povstatusattributes type="stringdictionary">
+      <item>
+        <key>currently_talking_to</key>
+        <value></value>
+      </item>
+    </povstatusattributes>
+    <defaultforeground>Black</defaultforeground>
+    <defaultbackground>BlanchedAlmond</defaultbackground>
+    <defaultfont>Verdana, Geneva, sans-serif</defaultfont>
     <pov type="object">fundee</pov>
     <start type="script">
       funds_needed = 100000
@@ -29,10 +38,10 @@
       list add (myFunderList, Steve)
       list add (myFunderList, Amand)
       list add (myFunderList, Chrys)
+      this.myTrueFunderList = myFunderList
     </start>
     <roomenter type="script">
     </roomenter>
-    <povstatusattributes type="stringdictionary" />
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -44,98 +53,15 @@
       EnableTimer (time_cycle)
       all_moves
     </firstenter>
+    <enter type="script">
+      picture ("hall.png")
+    </enter>
     <exit alias="west" to="Patio">
       <inherit name="westdirection" />
     </exit>
     <exit alias="east" to="Gallery">
       <inherit name="eastdirection" />
     </exit>
-    <object name="Steve">
-      <inherit name="editor_object" />
-      <inherit name="male" />
-      <thanked type="boolean">false</thanked>
-      <alias>Admiral Stevenerico Mostarpularious</alias>
-      <usedefaultprefix type="boolean">false</usedefaultprefix>
-      <prefix type="string"></prefix>
-      <displayverbs type="stringlist">
-        <value>Look at</value>
-        <value>Speak to</value>
-        <value>Introduce yourself to</value>
-      </displayverbs>
-      <trust type="int">0</trust>
-      <attr name="gave_fund" type="boolean">false</attr>
-      <look type="script">
-        invoke (this.image_rear)
-      </look>
-      <thank type="script">
-        if (GetBoolean(player, "funds_raised")) {
-          msg ("Steve says, \"It is my honor to sponsor a fellow voyager through the universe\"")
-          SetObjectFlagOn (Steve, "thanked")
-        }
-        else {
-          msg ("Steve looks confused, \"What for?\"")
-        }
-      </thank>
-      <punch type="script"><![CDATA[
-        if (GetOuter("hand") <> null) {
-          msg ("You punch through Steve. He is no longer here.")
-        }
-        else {
-          msg ("You put your dukes up and wind up for a big punch.")
-          PrintCentered ("I'm pretty sure you don't want to do that.")
-          msg ("You put your hands back down.")
-        }
-      ]]></punch>
-      <introduceyourselfto type="script">
-        picture ("Steve_front.PNG")
-        msg (this.alias + " says, ahoy " + fundee.worker_id + "!")
-        set (fundee, "currently_talking_to", this)
-      </introduceyourselfto>
-      <attr name="image_front" type="script">
-        picture ("Steve_front.PNG")
-      </attr>
-      <attr name="image_rear" type="script">
-        picture ("Steve_rear.PNG")
-      </attr>
-      <ask type="scriptdictionary">
-        <item key="boat ship">
-          if (fundee.currently_talking_to = this) {
-            firsttime {
-              msg ("Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with")
-              trust_increase_large (this)
-            }
-            otherwise {
-              already_talked (this)
-            }
-          }
-          else {
-            PrintCentered ("You need to introduce yourself first.")
-          }
-        </item>
-      </ask>
-      <tell type="scriptdictionary">
-        <item key="your family">
-          msg ("\"So your parents left you nothing? How disgraceful. I suppose it's not ENTIRELY your fault\"")
-          trust_decrease_small (this)
-        </item>
-        <item key="your finances">
-          tell_finance_topic (this)
-        </item>
-        <item key="your pitch;">
-          funding_pitch (this)
-        </item>
-        <item key="goodbye">
-        </item>
-      </tell>
-      <saygoodbyeto type="script">
-        msg ("\"Anchors, cast off!\"")
-        set (fundee, "currently_talking_to", null)
-      </saygoodbyeto>
-      <speak type="script">
-        msg ("\"Ahoy!\"")
-        set (fundee, "currently_talking_to", fundee)
-      </speak>
-    </object>
     <object name="NoOne">
       <inherit name="editor_object" />
       <visible type="boolean">false</visible>
@@ -153,6 +79,7 @@
       </admire>
       <lift type="script">
         msg ("You lift the vase, revealing something underneath.")
+        picture ("debugroom_detail.png")
         msg ("The vase is very heavy, so you set it back down.")
       </lift>
     </object>
@@ -188,12 +115,24 @@
       <alias>Socialite Amanderye Wischopillorhoffman</alias>
       <trust type="int">0</trust>
       <attr name="gave_fund" type="boolean">false</attr>
+      <thanked type="boolean">false</thanked>
       <attr name="image_front" type="script">
         picture ("Amand_front.PNG")
       </attr>
       <attr name="image_rear" type="script">
         picture ("Amand_rear.PNG")
       </attr>
+      <punch type="script"><![CDATA[
+        if (GetOuter("hand") <> null) {
+          msg ("You punch through Amand. She turns into a pile of miniature feather boas and drifts to the floor")
+          list remove (game.myTrueFunderList, Amand)
+        }
+        else {
+          msg ("You put your dukes up and wind up for a big punch.")
+          PrintCentered ("I'm pretty sure you don't want to do that.")
+          msg ("You put your hands back down.")
+        }
+      ]]></punch>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -265,12 +204,127 @@
       <look>Genius Chrysteravegnar Poppylivoginowrbt looks distracted by all his devices. Each one buzzes at seemingly random intervals. </look>
       <trust type="int">0</trust>
       <attr name="gave_fund" type="boolean">false</attr>
+      <thanked type="boolean">false</thanked>
       <attr name="image_front" type="script">
         picture ("Chrys_front.PNG")
       </attr>
       <attr name="image_rear" type="script">
         picture ("Chrys_rear.PNG")
       </attr>
+      <punch type="script"><![CDATA[
+        if (GetOuter("hand") <> null) {
+          msg ("You punch through Chrys. He turns into a pile of miniature pagers and clatters to the floor")
+          list remove (game.myTrueFunderList, Chrys)
+        }
+        else {
+          msg ("You put your dukes up and wind up for a big punch.")
+          PrintCentered ("I'm pretty sure you don't want to do that.")
+          msg ("You put your hands back down.")
+        }
+      ]]></punch>
+    </object>
+    <object name="Steve">
+      <inherit name="editor_object" />
+      <inherit name="male" />
+      <thanked type="boolean">false</thanked>
+      <alias>Admiral Stevenerico Mostarpularious</alias>
+      <usedefaultprefix type="boolean">false</usedefaultprefix>
+      <prefix type="string"></prefix>
+      <displayverbs type="stringlist">
+        <value>Look at</value>
+        <value>Speak to</value>
+        <value>Introduce yourself to</value>
+      </displayverbs>
+      <trust type="int">0</trust>
+      <attr name="gave_fund" type="boolean">false</attr>
+      <look type="script">
+        invoke (this.image_rear)
+      </look>
+      <thank type="script">
+        if (GetBoolean(player, "funds_raised")) {
+          msg ("Steve says, \"It is my honor to sponsor a fellow voyager through the universe\"")
+          SetObjectFlagOn (Steve, "thanked")
+        }
+        else {
+          msg ("Steve looks confused, \"What for?\"")
+        }
+      </thank>
+      <punch type="script"><![CDATA[
+        if (GetOuter("hand") <> null) {
+          msg ("You punch through Steve. He turns into a pile of miniature submarines and scatters to the floor")
+          list remove (game.myTrueFunderList, Steve)
+        }
+        else {
+          msg ("You put your dukes up and wind up for a big punch.")
+          PrintCentered ("I'm pretty sure you don't want to do that.")
+          msg ("You put your hands back down.")
+        }
+      ]]></punch>
+      <introduceyourselfto type="script">
+        picture ("Steve_front.PNG")
+        msg (this.alias + " says, ahoy " + fundee.worker_id + "!")
+        set (fundee, "currently_talking_to", this)
+      </introduceyourselfto>
+      <attr name="image_front" type="script">
+        picture ("Steve_front.PNG")
+      </attr>
+      <attr name="image_rear" type="script">
+        picture ("Steve_rear.PNG")
+      </attr>
+      <saygoodbyeto type="script">
+        msg ("\"Anchors, cast off!\"")
+        set (fundee, "currently_talking_to", null)
+      </saygoodbyeto>
+      <speak type="script">
+        msg ("\"Ahoy!\"")
+        set (fundee, "currently_talking_to", fundee)
+      </speak>
+      <ask type="scriptdictionary">
+        <item key="his boat; his ship">
+          if (fundee.currently_talking_to = this) {
+            firsttime {
+              msg ("Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with")
+              trust_increase_large (this)
+            }
+            otherwise {
+              already_talked (this)
+            }
+          }
+          else {
+            PrintCentered ("You need to introduce yourself first.")
+          }
+        </item>
+      </ask>
+      <tell type="scriptdictionary">
+        <item key="your family">
+          if (fundee.currently_talking_to = this) {
+            firsttime {
+              msg ("\"So your parents left you nothing? How disgraceful. I suppose it's not ENTIRELY your fault\"")
+              trust_decrease_small (this)
+              if (ListContains(ScopeVisible(), Chrys)) {
+                trust_decrease_medium (Chrys)
+              }
+              else if (ListContains(ScopeVisible(), Amand)) {
+                trust_increase_medium (Amand)
+              }
+            }
+            otherwise {
+              already_talked (this)
+            }
+          }
+          else {
+            PrintCentered ("You need to introduce yourself first.")
+          }
+        </item>
+        <item key="your finances">
+          tell_finance_topic (this)
+        </item>
+        <item key="your pitch;">
+          funding_pitch (this)
+        </item>
+        <item key="goodbye">
+        </item>
+      </tell>
     </object>
   </object>
   <turnscript name="CheckForAmount">
@@ -314,7 +368,14 @@
         PrintCentered ("You are truly a good citizen. Your future family will speak of your brilliance for generations to come.")
         finish
       }
-      foreach (funder, myFunderList) {
+      game.all_thanked = true
+      foreach (funder, game.myTrueFunderList) {
+        if (funder.thanked = false) {
+          game.all_thanked = false
+        }
+      }
+      if (game.all_thanked = true) {
+        game_exit
       }
     </script>
   </turnscript>
@@ -343,12 +404,16 @@
       <possessive>theirs</possessive>
       <ask type="scriptdictionary">
         <item key="love">
-          foreach (, ) {
+          foreach (funder, game.myTrueFunderList) {
             PrintCentered ("DEBUG: ALL FUNDER TRUST AT MAX")
+            funder.trust = 100
           }
         </item>
         <item key="hate">
           PrintCentered ("DEBUG: ALL FUNDER TRUST AT MINIMUM")
+          foreach (funder, game.myTrueFunderList) {
+            funder.trust = -100
+          }
         </item>
         <item key="being rich">
           PrintCentered ("DEBUG: FUNDS SET TO EXACT AMOUNT")
@@ -380,14 +445,6 @@
   <object name="apartment">
     <inherit name="editor_room" />
     <firstenter type="script">
-      msg ("You take off the VR headset. Your text pager receives a ping.")
-      if (fundee.hack_win) {
-        PrintCentered ("Congratulations! Your mortgage has been financed by:")
-        if (funder.thanked) {
-          print_funder_list
-        }
-        PrintCentered ("Your payments to these individuals will begin on [" + queen.initial_payment_date + "]")
-      }
     </firstenter>
     <object name="vr_headset">
       <inherit name="editor_object" />
@@ -641,13 +698,35 @@
     funder.trust = funder.trust - 5
   </function>
   <function name="trust_decrease_medium" parameters="funder">
-    msg (funder.alias + " looks like " + funder.gender + " trusts you a less.")
+    msg (funder.alias + " looks like " + funder.gender + " trusts you less.")
     funder.trust = funder.trust - 10
   </function>
   <function name="trust_decrease_large" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a lot less.")
     funder.trust = funder.trust - 15
   </function>
+  <function name="game_exit"><![CDATA[
+    msg ("You take off the VR headset. You're out. A message comes in on your text pager device. It's a message from The Queen")
+    MoveObject (fundee, apartment)
+    if (fundee.funds > fundee.funds_needed - 1) {
+      msg ("Congratulations, you raised a total of $" + fundee.funds + "! It looks like you be able to own your own home after 60 years!")
+      foreach (funder, game.myTrueFunderList) {
+        if (funder.thanked = true) {
+          IncreaseObjectCounter (fundee, "funders")
+        }
+      }
+      msg ("You will be paying to the following [" + fundee.funders + "] funders.")
+      foreach (funder, game.myTrueFunderList) {
+        msg ("\"Funder: \" + funder.alias")
+      }
+      msg ("\"Your children after you will speak of you in their stories and legends. Prepare for your first step out of commonality and intro greatness\"")
+      finish
+    }
+    else {
+      msg ("Although you did not raise enough money to finance your mortgage, do not feel ashamed. Only 5% of total participants raise enough funds. For the rest of your life, you are still expected to remain productive while we take 95% of your input for rent. Enjoy the rest of your life.")
+      finish
+    }
+  ]]></function>
   <walkthrough name="testing">
     <steps type="simplestringlist">
       grasb Vase
@@ -661,16 +740,6 @@
     <steps type="simplestringlist">
       ask Steve about boat
       ask Steve about boat
-    </steps>
-  </walkthrough>
-  <walkthrough name="central_win_hacking">
-    <steps type="simplestringlist">
-      grasb vase
-      wear fist
-      go west
-      punch ocean
-      go west
-      ask The Queen about being rich
     </steps>
   </walkthrough>
   <walkthrough name="central_win_funding">
@@ -693,6 +762,40 @@
       introduce yourself to Steve
       ask Steve about boat
       say goodbye to Steve
+    </steps>
+  </walkthrough>
+  <walkthrough name="ConversationTest">
+    <steps type="simplestringlist">
+      talk to The Queen
+      talk to The Queen
+      12345
+      wait
+      event:ShowMenuResponse;I am ready now
+      go west
+      introduce yourself to Steve
+      tell Steve about your family
+    </steps>
+  </walkthrough>
+  <walkthrough name="central_win_hacking">
+    <steps type="simplestringlist">
+      talk to The Queen
+      talk to The Queen
+      12345
+      wait
+      event:ShowMenuResponse;I am ready now
+      lift vase
+      grasb vase
+      wear fist
+      go west
+      punch ocean
+      go west
+      ask The Queen about being rich
+      go east
+      punch Steve
+      punch Chrys
+      go east
+      go east
+      punch Amand
     </steps>
   </walkthrough>
   <timer name="time_cycle">
