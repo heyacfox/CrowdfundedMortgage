@@ -14,7 +14,7 @@
     <attr name="funds_raised" type="boolean">false</attr>
     <attr name="time_cycle_count" type="int">5</attr>
     <category>Surreal</category>
-    <enablehyperlinks type="boolean">false</enablehyperlinks>
+    <enablehyperlinks />
     <turnoffplacesandobjects />
     <setcustompadding />
     <custompaddingright type="int">10</custompaddingright>
@@ -26,6 +26,11 @@
     <defaultforeground>Black</defaultforeground>
     <defaultbackground>BlanchedAlmond</defaultbackground>
     <defaultfont>Verdana, Geneva, sans-serif</defaultfont>
+    <feature_pictureframe />
+    <attr name="autodescription_youarein_newline" type="boolean">false</attr>
+    <attr name="autodescription_youarein_useprefix" type="boolean">false</attr>
+    <autodescription_description_newline />
+    <command_newline />
     <pov type="object">fundee</pov>
     <start type="script">
       funds_needed = 100000
@@ -34,6 +39,7 @@
       list add (myFunderList, Amand)
       list add (myFunderList, Chrys)
       this.myTrueFunderList = myFunderList
+      change_picture_frame (null, null, null)
     </start>
     <roomenter type="script">
     </roomenter>
@@ -49,7 +55,7 @@
       all_moves
     </firstenter>
     <enter type="script">
-      picture ("hall.png")
+      SetFramePicture ("hall.png")
     </enter>
     <exit alias="west" to="Patio">
       <inherit name="westdirection" />
@@ -137,6 +143,12 @@
           msg ("\"What for?\"")
         }
       </thank>
+      <introduceyourselfto type="script">
+        firsttime {
+          msg ("A please to meet you, " + fundee.worker_id)
+          trust_increase_medium
+        }
+      </introduceyourselfto>
       <tell type="scriptdictionary">
         <item key="your finances">
           tell_finance_topic (this)
@@ -192,12 +204,6 @@
           }
         </item>
       </ask>
-      <introduceyourselfto type="script">
-        firsttime {
-          msg ("A please to meet you, " + fundee.worker_id)
-          trust_increase_medium
-        }
-      </introduceyourselfto>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -296,6 +302,12 @@
           msg ("\"What for?\"")
         }
       </thank>
+      <introduceyourselfto type="script">
+        firsttime {
+          msg ("Whatever")
+          trust_decrease_small
+        }
+      </introduceyourselfto>
       <ask type="scriptdictionary">
         <item key="company">
           firsttime {
@@ -366,12 +378,6 @@
           funding_pitch (this)
         </item>
       </tell>
-      <introduceyourselfto type="script">
-        firsttime {
-          msg ("Whatever")
-          trust_decrease_small
-        }
-      </introduceyourselfto>
     </object>
     <object name="Steve">
       <inherit name="editor_object" />
@@ -651,6 +657,8 @@
   </object>
   <object name="queen_void">
     <inherit name="editor_room" />
+    <usedefaultprefix type="boolean">false</usedefaultprefix>
+    <alias>The VR Void</alias>
     <object name="queen_intro">
       <inherit name="editor_object" />
       <inherit name="namedfemale" />
@@ -678,6 +686,9 @@
           get input {
             set (fundee, "worker_id", result)
             PrintCentered ("Thank you, please wait a moment while I connect to HIVE to verify your information.")
+            SetTimeout (2) {
+              queen_questions
+            }
           }
         }
       </speak>
@@ -714,7 +725,7 @@
   <turnscript name="id_check">
     <enabled />
     <script><![CDATA[
-      if (game.pov.parent = queen_void) {
+      if (IsSwitchedOn(Amand)) {
         if (fundee.worker_id <> null) {
           queen_questions
         }
@@ -1016,7 +1027,11 @@
       finish
     }
   ]]></function>
-  <function name="show_correct_image" />
+  <function name="show_correct_image">
+  </function>
+  <function name="change_picture_frame" parameters="front_char, back_char, background"><![CDATA[
+    SetFramePicture ("<img src=\"" + GetFileURL("hall.png") + "\" style=\"float:left;width:60px;\" />")
+  ]]></function>
   <walkthrough name="testing">
     <steps type="simplestringlist">
       grasb Vase
