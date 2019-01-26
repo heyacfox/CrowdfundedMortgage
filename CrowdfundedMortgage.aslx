@@ -21,6 +21,7 @@
     <custompaddingleft type="int">10</custompaddingleft>
     <setcustomwidth />
     <customwidth type="int">1200</customwidth>
+    <attr name="time_cycle_count_start" type="int">5</attr>
     <pov type="object">fundee</pov>
     <start type="script">
       funds_needed = 100000
@@ -31,7 +32,7 @@
     </start>
     <roomenter type="script">
     </roomenter>
-    <attr name="time_cycle_count_start" type="int">5</attr>
+    <povstatusattributes type="stringdictionary" />
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -98,26 +99,42 @@
       </attr>
       <ask type="scriptdictionary">
         <item key="boat ship">
-          firsttime {
-            msg ("Thank you for asking me about that. I do love my ship. when I first sailed the seas")
-            this.trust = this.trust + 10
+          if (fundee.currently_talking_to = this) {
+            firsttime {
+              msg ("Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with")
+              trust_increase_large (this)
+            }
+            otherwise {
+              already_talked (this)
+            }
           }
-          otherwise {
-            already_talked (this)
+          else {
+            PrintCentered ("You need to introduce yourself first.")
           }
         </item>
       </ask>
       <tell type="scriptdictionary">
-        <item key="self">
-          msg ("Steve shifts his weight, and looks up. \"Ahhhhh where to begin. I received my first ship when I was twelve. I crossed the Atlantic the first time when I was 14. I learned everything I know from my father.\"")
+        <item key="your family">
+          msg ("\"So your parents left you nothing? How disgraceful. I suppose it's not ENTIRELY your fault\"")
+          trust_decrease_small (this)
         </item>
-        <item key="finances">
+        <item key="your finances">
           tell_finance_topic (this)
         </item>
         <item key="your pitch;">
           funding_pitch (this)
         </item>
+        <item key="goodbye">
+        </item>
       </tell>
+      <saygoodbyeto type="script">
+        msg ("\"Anchors, cast off!\"")
+        set (fundee, "currently_talking_to", null)
+      </saygoodbyeto>
+      <speak type="script">
+        msg ("\"Ahoy!\"")
+        set (fundee, "currently_talking_to", fundee)
+      </speak>
     </object>
     <object name="NoOne">
       <inherit name="editor_object" />
@@ -391,6 +408,16 @@
       <gender>they</gender>
       <article>them</article>
       <possessive>theirs</possessive>
+      <intro_questions type="stringlist">
+        <value>Why am I here</value>
+        <value>How does this work</value>
+        <value>What should I ask the funders</value>
+        <value>Where will I meet the funders</value>
+        <value>Who will my funders be</value>
+        <value>I am ready now</value>
+        <value>How much time will I have</value>
+      </intro_questions>
+      <attr name="finished_talking" type="boolean">false</attr>
       <speak type="script">
         PrintCentered ("Hello productive member of society")
         firsttime {
@@ -404,14 +431,6 @@
           }
         }
       </speak>
-      <intro_questions type="stringlist">
-        <value>Why am I here?</value>
-        <value>How does this work?</value>
-        <value>What should I ask the funders?</value>
-        <value>Where will I meet the funders?</value>
-        <value>Who will my funders be?</value>
-        <value>I am ready now</value>
-      </intro_questions>
     </object>
     <exit name="void_exit" alias="out" to="Central Hall">
       <inherit name="outdirection" />
@@ -445,9 +464,10 @@
   <turnscript name="id_check">
     <enabled />
     <script><![CDATA[
-      if (fundee.worker_id <> null) {
-        queen_questions
-        DisableTurnScript (id_check)
+      if (game.pov.parent = queen_void) {
+        if (fundee.worker_id <> null) {
+          queen_questions
+        }
       }
     ]]></script>
   </turnscript>
@@ -470,6 +490,11 @@
     <property>lift</property>
     <pattern>lift</pattern>
     <defaultexpression>"You can't lift " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>saygoodbyeto</property>
+    <pattern>say goodbye to #object#;</pattern>
+    <defaultexpression>"You can't say goodbye to #object#; " + object.article + "."</defaultexpression>
   </verb>
   <function name="tell_finance_topic" parameters="funder">
     set (fundee, "currently_talking_to", funder)
@@ -505,27 +530,28 @@
       queen_questions
     }
     otherwise {
-      ShowMenu ("", queen_intro.intro_questions, true) {
+      ShowMenu ("What do you want to know about?", queen_intro.intro_questions, false) {
         switch (result) {
-          case (Why am I here?) {
+          case ("Why am I here") {
             PrintCentered ("You are here because you have a once in a lifetime opportunity. You began your life poor, but you have the chance to obtain a 60 year mortgage to own a home.")
           }
-          case (What should I ask the funders?) {
+          case ("What should I ask the funders") {
             PrintCentered ("I would recommend you INTRODUCE YOURSELF TO them. Then, you might want ASK them about himself/herself. That will bring up a number of topics you could discuss with them. Lastly, you might consider to TELL them about your family, finances, or anything else that will show them you are trustworthy to invest in.")
           }
-          case (How does this work?) {
+          case ("How does this work") {
+            PrintCentered ("There will be a number of very wealthy individuals in the space you about to enter. You will need to convince them they should trust you enough that they will provide you funding. After you think you have gained enough trust, you should TELL them YOUR PITCH, and they will decide whether or not you are worthy. They need to know you will be able to pay them back, after all.")
           }
-          case (Where will I meet the funders?) {
+          case ("Where will I meet the funders") {
+            PrintCentered ("You will meet the funders in a carefull crafted space, to allow you both to see each other as you are. Feel free to wander around, as they will be doing so too.")
           }
-          case (Who will my funders be?) {
+          case ("Who will my funders be") {
+            PrintCentered ("You will meet your potential funders soon enough. To keep it fair, I will not tell you anything about them until you arrive.")
           }
-          case (I am ready now) {
+          case ("I am ready now") {
             MoveObject (fundee, Central Hall)
           }
-          default {
-            if (game.pov.parent = queen_void) {
-              queen_questions
-            }
+          case ("How much time will I have") {
+            PrintCentered ("You will have exactly " + game.time_cycle_count_start + " minutes to raise enough funds for your mortgage. I will remind you every minute that passes. Don't pitch too soon, after you deliver your pitch you will not get another chance.")
           }
         }
       }
@@ -538,7 +564,7 @@
   </function>
   <function name="already_talked" parameters="funder">
     msg ("You see " + funder.gender + " looks disgruntled, \"I already talked to you about that.\"")
-    funder.trust = funder.trust - 5
+    trust_increase_small (funder)
   </function>
   <function name="trust_increase_small" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a little more.")
@@ -548,7 +574,7 @@
     if (funder.gave_fund = false) {
       if (funder.trust > 0) {
         msg ("You give your best funding pitch to " + funder.article)
-        msg ("Thankfully, " + funder.alias + "says, \"Alright, I can go in for that\"")
+        msg ("Thankfully, " + funder.alias + " says, \"Alright, I can go in for that\"")
         funder.gave_fund = true
         fundee.funds = funder.trust * 1000
       }
@@ -558,7 +584,7 @@
       }
     }
     else {
-      PrintCentered ("You already gave your pitch to " + funder.gender + ", try asking someone else")
+      PrintCentered ("You already gave your pitch to " + funder.article + ", try asking someone else")
     }
   ]]></function>
   <function name="change_room" parameters="funder, room"><![CDATA[
@@ -602,23 +628,23 @@
       change_room (Steve, Patio)
     }
   </function>
-  <function name="trust_increase_medium">
+  <function name="trust_increase_medium" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you more.")
     funder.trust = funder.trust + 10
   </function>
-  <function name="trust_increase_large">
+  <function name="trust_increase_large" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a lot more.")
     funder.trust = funder.trust + 15
   </function>
-  <function name="trust_decrease_small">
+  <function name="trust_decrease_small" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a little less.")
     funder.trust = funder.trust - 5
   </function>
-  <function name="trust_decrease_medium">
+  <function name="trust_decrease_medium" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a less.")
     funder.trust = funder.trust - 10
   </function>
-  <function name="trust_decrease_large">
+  <function name="trust_decrease_large" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a lot less.")
     funder.trust = funder.trust - 15
   </function>
@@ -663,6 +689,10 @@
       talk to The Queen
       142394
       wait
+      event:ShowMenuResponse;I am ready now
+      introduce yourself to Steve
+      ask Steve about boat
+      say goodbye to Steve
     </steps>
   </walkthrough>
   <timer name="time_cycle">
