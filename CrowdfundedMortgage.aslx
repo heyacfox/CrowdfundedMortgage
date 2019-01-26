@@ -22,12 +22,7 @@
     <setcustomwidth />
     <customwidth type="int">1200</customwidth>
     <attr name="time_cycle_count_start" type="int">5</attr>
-    <povstatusattributes type="stringdictionary">
-      <item>
-        <key>currently_talking_to</key>
-        <value></value>
-      </item>
-    </povstatusattributes>
+    <povstatusattributes type="stringdictionary" />
     <defaultforeground>Black</defaultforeground>
     <defaultbackground>BlanchedAlmond</defaultbackground>
     <defaultfont>Verdana, Geneva, sans-serif</defaultfont>
@@ -197,6 +192,12 @@
           }
         </item>
       </ask>
+      <introduceyourselfto type="script">
+        firsttime {
+          msg ("A please to meet you, " + fundee.worker_id)
+          trust_increase_medium
+        }
+      </introduceyourselfto>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -365,6 +366,12 @@
           funding_pitch (this)
         </item>
       </tell>
+      <introduceyourselfto type="script">
+        firsttime {
+          msg ("Whatever")
+          trust_decrease_small
+        }
+      </introduceyourselfto>
     </object>
     <object name="Steve">
       <inherit name="editor_object" />
@@ -404,9 +411,10 @@
         }
       ]]></punch>
       <introduceyourselfto type="script">
-        picture ("Steve_front.PNG")
-        msg (this.alias + " says, ahoy " + fundee.worker_id + "!")
-        set (fundee, "currently_talking_to", this)
+        firsttime {
+          msg ("AHOY, " + fundee.worker_id + "!")
+          trust_increase_small
+        }
       </introduceyourselfto>
       <attr name="image_front" type="script">
         picture ("Steve_front.PNG")
@@ -610,7 +618,7 @@
   <verb>
     <property>grasb</property>
     <pattern>grasb</pattern>
-    <defaultexpression>"You can't grasb " + object.article + "."</defaultexpression>
+    <defaultexpression>"Silly, that's not a word"</defaultexpression>
   </verb>
   <verb>
     <property>admire</property>
@@ -1008,6 +1016,7 @@
       finish
     }
   ]]></function>
+  <function name="show_correct_image" />
   <walkthrough name="testing">
     <steps type="simplestringlist">
       grasb Vase
