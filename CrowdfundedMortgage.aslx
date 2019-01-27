@@ -291,6 +291,21 @@
           already_talked (this)
         }
       </pets>
+      <fitness type="script">
+        firsttime {
+          msg ("\"All of my workouts are strictly non-sweat. If I can't wear my diamonds while working out that activity is certainly not for me.\"")
+          trust_decrease_small (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_medium (Chrys)
+          }
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_medium (Steve)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </fitness>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -1043,6 +1058,11 @@
     <property>pets</property>
     <pattern>pets</pattern>
     <defaultexpression>"You can't pets " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>fitness</property>
+    <pattern>fitness</pattern>
+    <defaultexpression>"You can't fitness " + object.article + "."</defaultexpression>
   </verb>
   <function name="tell_finance_topic" parameters="funder">
     set (fundee, "currently_talking_to", funder)
