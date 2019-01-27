@@ -39,15 +39,22 @@
       list add (myFunderList, Amand)
       list add (myFunderList, Chrys)
       this.myTrueFunderList = myFunderList
-      change_picture_frame (null, null, null)
+      if (game.SUPERDEBUG = true) {
+        change_picture_frame (Steve, Steve, Gallery)
+      }
     </start>
     <roomenter type="script">
     </roomenter>
+    <SUPERDEBUG type="boolean">false</SUPERDEBUG>
+    <attr name="temp_front" type="object">NoOne</attr>
+    <attr name="temp_back" type="object">NoOne</attr>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
     <usedefaultprefix type="boolean">false</usedefaultprefix>
     <prefix>the</prefix>
+    <picture type="string"></picture>
+    <attr name="real_image">hall.png</attr>
     <firstenter type="script">
       game.time_cycle_count = game.time_cycle_count_start
       PrintCentered ("You have " + game.time_cycle_count + " minutes remaining. Good luck!")
@@ -55,7 +62,7 @@
       all_moves
     </firstenter>
     <enter type="script">
-      SetFramePicture ("hall.png")
+      ImageOrderLogic
     </enter>
     <exit alias="west" to="Patio">
       <inherit name="westdirection" />
@@ -66,6 +73,8 @@
     <object name="NoOne">
       <inherit name="editor_object" />
       <visible type="boolean">false</visible>
+      <attr name="image_front">alltransparent.png</attr>
+      <attr name="image_rear">alltransparent.png</attr>
     </object>
     <object name="Vase">
       <inherit name="editor_object" />
@@ -101,11 +110,40 @@
       <drop type="boolean">false</drop>
       <look>This is obviously a glove that you can wear, but it has no weight. It looks like the graphics are missing.</look>
     </object>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
+    </object>
   </object>
   <object name="Gallery">
     <inherit name="editor_room" />
     <usedefaultprefix type="boolean">false</usedefaultprefix>
     <prefix>the</prefix>
+    <picture type="string"></picture>
+    <attr name="real_image">gallery.png</attr>
+    <enter type="script">
+      ImageOrderLogic
+    </enter>
     <exit alias="west" to="Central Hall">
       <inherit name="westdirection" />
     </exit>
@@ -117,12 +155,8 @@
       <trust type="int">0</trust>
       <attr name="gave_fund" type="boolean">false</attr>
       <thanked type="boolean">false</thanked>
-      <attr name="image_front" type="script">
-        picture ("Amand_front.PNG")
-      </attr>
-      <attr name="image_rear" type="script">
-        picture ("Amand_rear.PNG")
-      </attr>
+      <attr name="image_front">Amand_front.png</attr>
+      <attr name="image_rear">Amand_rear.png</attr>
       <punch type="script"><![CDATA[
         if (GetOuter("hand") <> null) {
           msg ("You punch through Amand. She turns into a pile of miniature feather boas and drifts to the floor")
@@ -245,6 +279,11 @@
     <prefix>the</prefix>
     <description>The mahogany floors creek gently under your feet. There is an exquisitely detailed railing with maple leaf flourishes. Out beyond the railing you can see the ocean. </description>
     <descprefix>You go to the</descprefix>
+    <picture type="string"></picture>
+    <attr name="real_image">patio.png</attr>
+    <enter type="script">
+      ImageOrderLogic
+    </enter>
     <exit alias="east" to="Central Hall">
       <inherit name="eastdirection" />
     </exit>
@@ -276,12 +315,8 @@
       <trust type="int">0</trust>
       <attr name="gave_fund" type="boolean">false</attr>
       <thanked type="boolean">false</thanked>
-      <attr name="image_front" type="script">
-        picture ("Chrys_front.PNG")
-      </attr>
-      <attr name="image_rear" type="script">
-        picture ("Chrys_rear.PNG")
-      </attr>
+      <attr name="image_front">Chrys_front.png</attr>
+      <attr name="image_rear">Chrys_rear.png</attr>
       <punch type="script"><![CDATA[
         if (GetOuter("hand") <> null) {
           msg ("You punch through Chrys. He turns into a pile of miniature pagers and clatters to the floor")
@@ -393,6 +428,8 @@
       </displayverbs>
       <trust type="int">0</trust>
       <attr name="gave_fund" type="boolean">false</attr>
+      <attr name="image_front">Steve_front.png</attr>
+      <attr name="image_rear">Steve_rear.png</attr>
       <look type="script">
         invoke (this.image_rear)
       </look>
@@ -422,12 +459,6 @@
           trust_increase_small
         }
       </introduceyourselfto>
-      <attr name="image_front" type="script">
-        picture ("Steve_front.PNG")
-      </attr>
-      <attr name="image_rear" type="script">
-        picture ("Steve_rear.PNG")
-      </attr>
       <saygoodbyeto type="script">
         msg ("\"Anchors, cast off!\"")
         set (fundee, "currently_talking_to", null)
@@ -697,30 +728,6 @@
       <inherit name="outdirection" />
       <visible type="boolean">false</visible>
     </exit>
-    <object name="fundee">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-      <alias>fundee</alias>
-      <statusattributes type="stringdictionary">
-        <item>
-          <key>funds</key>
-          <value></value>
-        </item>
-        <item>
-          <key>funds_needed</key>
-          <value></value>
-        </item>
-      </statusattributes>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
-    </object>
   </object>
   <turnscript name="id_check">
     <enabled />
@@ -955,9 +962,6 @@
     }
   ]]></function>
   <function name="all_moves">
-    SetTimeout (game.time_cycle_count_start * 60 *  1 / 12) {
-      change_room (Steve, Patio)
-    }
     SetTimeout (game.time_cycle_count_start * 60 *  2 / 12) {
       change_room (Amand, Central Hall)
     }
@@ -1029,9 +1033,66 @@
   ]]></function>
   <function name="show_correct_image">
   </function>
-  <function name="change_picture_frame" parameters="front_char, back_char, background"><![CDATA[
-    SetFramePicture ("<img src=\"" + GetFileURL("hall.png") + "\" style=\"float:left;width:60px;\" />")
+  <function name="change_picture_frame" parameters="front_char, back_char, room"><![CDATA[
+    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 500px; height: 500px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:500px;'/>")
+    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 500px; height: 500px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:500px;'/></div>")
+    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 500px; height: 500px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:500px;'/>")
+    msg ("<img src='" + GetFileURL("alltransparent.png") + "' style='float:top;width:500px;'/>")
+    if (game.pov.parent = Central Hall) {
+      change_picture_frame
+    }
+    else if (game.pov.parent = Gallery) {
+    }
+    else if (game.pov.parent = Patio) {
+    }
+    if (ListContains(ScopeVisible(), Steve)) {
+    }
+    if (ListContains(ScopeVisible(), Chrys)) {
+    }
+    if (ListContains(ScopeVisible(), Amand)) {
+    }
   ]]></function>
+  <function name="ImageOrderLogic">
+    game.temp_front = NoOne
+    game.temp_back = NoOne
+    if (ListContains(ScopeVisible(), Chrys)) {
+      if (ListContains(ScopeVisible(), Steve)) {
+        game.temp_front = Chrys
+        game.temp_back = Steve
+      }
+      else if (ListContains(ScopeVisible(), Amand)) {
+        game.temp_front = Chrys
+        game.temp_back = Amand
+      }
+      else {
+        game.temp_back = Chrys
+      }
+    }
+    if (game.temp_back = NoOne) {
+      if (ListContains(ScopeVisible(), Steve)) {
+        if (ListContains(ScopeVisible(), Amand)) {
+          game.temp_front = Steve
+          game.temp_back = Amand
+        }
+        else {
+          game.temp_back = Steve
+        }
+      }
+    }
+    if (game.temp_back = NoOne) {
+      if (ListContains(ScopeVisible(), Amand)) {
+        game.temp_back = Amand
+      }
+    }
+    if (game.temp_front = NoOne) {
+      if (ListContains(ScopeVisible(), fundee.currently_talking_to)) {
+        game.temp_front = fundee.currently_talking_to
+        game.temp_back = NoOne
+      }
+    }
+    change_picture_frame (game.temp_front, game.temp_back, fundee.parent)
+    msg("here is a message" + game.temp_front.alias + " and " + game.temp_back.alias + " and " + fundee.parent.alias + "!")
+  </function>
   <walkthrough name="testing">
     <steps type="simplestringlist">
       grasb Vase
@@ -1062,11 +1123,6 @@
       talk to The Queen
       talk to The Queen
       142394
-      wait
-      event:ShowMenuResponse;I am ready now
-      introduce yourself to Steve
-      ask Steve about boat
-      say goodbye to Steve
     </steps>
   </walkthrough>
   <walkthrough name="ConversationTest">
@@ -1189,7 +1245,7 @@
   </walkthrough>
   <timer name="time_cycle">
     <interval>60</interval>
-    <enabled />
+    <enabled type="boolean">false</enabled>
     <script><![CDATA[
       SetTimerInterval (time_cycle, 60)
       if (game.time_cycle_count > 1) {
