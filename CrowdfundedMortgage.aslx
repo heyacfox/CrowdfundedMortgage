@@ -1141,6 +1141,7 @@
             msg ("Feeling as if you gained her trust, you pretend to faint and let out a breathy, woeful sigh, \"I am impressed by your FABULOUS life. If only I could be as beautiful as your diamonds. Right now am nothing but a crumbly lump of coal. But even coal becomes diamonds with enough pressure. And so with your investment, I could becomes as elegant and show your brilliance like one of the diamonds on your necklace.<br/><br/>She fondles the diamonds around her neck and nods approvingly.")
           }
           case (Chrys) {
+            msg ("<br/>Seeing your opening, you launch into your elevator pitch, \"I can tell now you're a man of low risk and high reward and precisely measured outcomes. What if I told you that you had a once on a lifetime oppportunity for the best ROI investment in the history of Googface Valley. I may look like an underfunded struggling startup on a shoestring, but all true success is determined by how far down you start. If you invest in someone with a lot of money already, what kind of return do you get? 5%? 10%? 50%? With how much I have now, you could be getting back one hundred, one thousand, no wait ONE MILLION percent return! How can you say no to that.\"<br/><br/>He looks up from his phone, startled. He quints beadily, and swipes right. <br/>")
           }
         }
         msg ("Thankfully, " + funder.alias + " says, \"Alright, I can go in for that\"")
