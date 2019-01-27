@@ -24,7 +24,7 @@
     <setcustompadding />
     <custompaddingright type="int">10</custompaddingright>
     <custompaddingleft type="int">10</custompaddingleft>
-    <setcustomwidth />
+    <setcustomwidth type="boolean">false</setcustomwidth>
     <customwidth type="int">900</customwidth>
     <attr name="time_cycle_count_start" type="int">10</attr>
     <povstatusattributes type="stringdictionary" />
@@ -59,9 +59,10 @@
     <menufontsize type="int">14</menufontsize>
     <customstatuspane />
     <cover>10minutemorgagetitle.png</cover>
-    <description><![CDATA[This is a dystopian techno-capitalist future novel where you have to get a mortgage directly from investors because there are no financial intermediaries.<br/><br/>]]></description>
+    <description><![CDATA[This is a dystopian techno-capitalist future novel where you have to get a mortgage directly from investors because there are no financial intermediaries.<br/><br/><br/>Made during Global Game Jam 2019. Thank you bublup.com for hosting a great Jam site for 2019!!!]]></description>
     <author>Nathaniel Hahn, Tyler Samson, Bon Beau, and Agave</author>
     <subtitle>Trial of the Googface</subtitle>
+    <custompaddingbottom type="int">30</custompaddingbottom>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -184,6 +185,9 @@
           msg ("A pleasure to meet you, " + fundee.worker_id + ". I am a person of the highest culture, with all the best gems and luxury.")
           trust_increase_medium (this)
         }
+        otherwise {
+          msg ("You already introduced yourself to her.")
+        }
       </introduceyourselfto>
       <gems type="script">
         firsttime {
@@ -290,6 +294,7 @@
           already_talked (this)
         }
       </fitness>
+      <pitched type="boolean">false</pitched>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -342,7 +347,7 @@
     <inherit name="editor_room" />
     <usedefaultprefix type="boolean">false</usedefaultprefix>
     <prefix>the</prefix>
-    <description>The mahogany floors creek gently under your feet. There is an exquisitely detailed railing with maple leaf flourishes. Out beyond the railing you can see the ocean. </description>
+    <description>The mahogany floors creak gently under your feet. There is an exquisitely detailed railing with maple leaf flourishes. Out beyond the railing you can see the ocean. </description>
     <descprefix>You go to the</descprefix>
     <picture type="string"></picture>
     <attr name="real_image">patio.png</attr>
@@ -411,6 +416,9 @@
         firsttime {
           msg ("Whatever. You're taking up my time I could be spending on my company.")
           trust_decrease_small (this)
+        }
+        otherwise {
+          msg ("You already introduced yourself to him.")
         }
       </introduceyourselfto>
       <hiscompany type="script">
@@ -496,6 +504,7 @@
           already_talked (this)
         }
       </feelings>
+      <pitched type="boolean">false</pitched>
       <pets type="script">
         firsttime {
           msg ("\"It better have a programmable chip implanted.\"")
@@ -555,6 +564,9 @@
         firsttime {
           msg ("AHOY, " + fundee.worker_id + "!")
           trust_increase_small (this)
+        }
+        otherwise {
+          msg ("You already introduced yourself to him")
         }
       </introduceyourselfto>
       <hisfather type="script">
@@ -667,13 +679,14 @@
           already_talked (this)
         }
       </pets>
+      <pitched type="boolean">false</pitched>
     </object>
   </object>
   <turnscript name="CheckForAmount">
     <enabled />
     <script><![CDATA[
       if (fundee.funds >= fundee.funds_needed) {
-        PrintCentered ("You raised enough funds. So long as you remain a productive member of the proletariat, you will live out the rest of your life in a home that you will own after 60 years working. This is a great honor, less than 5% of people have this opportunity. You should be grateful. Why don't you thank your sponsors now?")
+        PrintCentered ("Googface: You raised enough funds. So long as you remain a productive member of the proletariat, you will live out the rest of your life in a home that you will own after 60 years working. This is a great honor, less than 5% of people have this opportunity. You should be grateful. Why don't you thank your sponsors now?")
         SetObjectFlagOn (fundee, "funds_raised")
         DisableTurnScript (CheckForAmount)
         DisableTimer (time_cycle)
@@ -811,16 +824,17 @@
       <look>You have 854 messages unread. Most of them are targeted ads based on your Googface data profile.</look>
       <alias>pager</alias>
       <check type="script"><![CDATA[
-        msg ("Every person has a specific worker ID, but something went wrong with yours so you had to get a new pager. At least this one doesn't have googstains on it.")
-        msg ("A message appears on the pager.")
-        DisableTimer (pager_buzz)
-        PrintCentered ("CONGRATULATIONS. OUR GRACIOUS LEADER GOOGFACE, AI, HAS ALLOWED YOU TO PARTAKE IN A SPECIAL PROGRAM. THIS IS YOUR ONE CHANCE TO GET A MORTGAGE, DON'T MISS IT. ")
-        PrintCentered ("We have already mapped your headset to the void space, where Googface, our gracious leader, will tell you more.")
-        msg ("All right, you should wear your <a style=\"color:Blue\" class=\"cmdlink elementmenu\" data-elementid=\"vr_headset\" data-verbs=\"wear\">VR Headset</a>.")
-        MakeObjectVisible (vr_headset)
         if (GetBoolean(pager, "end_game")) {
+          final_check
         }
         else if (GetBoolean(pager, "begin_game")) {
+          msg ("Every person has a specific worker ID, but something went wrong with yours so you had to get a new pager. At least this one doesn't have googstains on it.")
+          msg ("A message appears on the pager.")
+          DisableTimer (pager_buzz)
+          PrintCentered ("CONGRATULATIONS. OUR GRACIOUS LEADER GOOGFACE, AI, HAS ALLOWED YOU TO PARTAKE IN A SPECIAL PROGRAM. THIS IS YOUR ONE CHANCE TO GET A MORTGAGE, DON'T MISS IT. ")
+          PrintCentered ("We have already mapped your headset to the void space, where Googface, our gracious leader, will tell you more.")
+          msg ("All right, you should wear your <a style=\"color:Blue\" class=\"cmdlink elementmenu\" data-elementid=\"vr_headset\" data-verbs=\"wear\">VR Headset</a>.")
+          MakeObjectVisible (vr_headset)
         }
         else {
           msg ("You don't feel like reading your spam messages now.;")
@@ -881,7 +895,7 @@
       </intro_questions>
       <attr name="finished_talking" type="boolean">false</attr>
       <look>The Googface is everywhere and know where.</look>
-      <speak type="script">
+      <speak type="script"><![CDATA[
         msg ("Googface: Hello productive member of society")
         firsttime {
           first_check
@@ -893,13 +907,13 @@
             SetTimeout (1) {
               queen_questions
             }
-            msg ("Googface: Thank you, please wait a moment while I connect to the Googface master server to verify your information.")
+            msg ("Googface: Thank you, please wait a moment while I connect to the Googface master server to verify your information.<br/>")
           }
           EnableTurnScript (id_check)
         }
         otherwise {
         }
-      </speak>
+      ]]></speak>
     </object>
     <exit name="void_exit" alias="out" to="Central Hall">
       <inherit name="outdirection" />
@@ -910,6 +924,7 @@
     <enabled type="boolean">false</enabled>
     <script><![CDATA[
       if (fundee.worker_id <> null) {
+        msg ("Thank you, " + fundee.worker_id + "<br />")
         queen_questions
       }
     ]]></script>
@@ -1193,40 +1208,38 @@
       msg ("Absolutely not.")
     }
   ]]></function>
-  <function name="queen_questions">
+  <function name="queen_questions"><![CDATA[
     firsttime {
       msg ("Googface: I am here to answer any of  your questions. Googface has infinite processing time to spend with you to prepare you for this event.")
       queen_questions
     }
     otherwise {
-      ShowMenu ("What do you want to know about?", queen_intro.intro_questions, false) {
+      ShowMenu ("What do you want to know about, " + fundee.worker_id + "?", queen_intro.intro_questions, false) {
         switch (result) {
           case ("Why am I here") {
-            msg ("Googface: You will have the opportunity to audition before 3 prestigious individuals who will determine your worthiness as an investment opportunity. You must convince them to allow you the opportunity to be exploited for 60 years in exchange for a home mortgage. This is a great privilege, you should be honored.")
-            msg ("")
+            msg ("Googface: You will have the opportunity to audition before 3 prestigious individuals who will determine your worthiness as an investment opportunity. You must convince them to allow you the opportunity to be exploited for 60 years in exchange for a home mortgage. This is a great privilege, you should be honored.<br/>")
           }
           case ("What should I ask the funders") {
-            msg ("Googface: You should tell them about yourself, and ask them about their selection criteria. Make them feel confident about their decision.")
-            msg ("")
+            msg ("Googface: You should tell them about yourself, and ask them about their selection criteria. Make them feel confident about their decision.<br/>")
           }
           case ("I am ready now") {
             MoveObject (fundee, Central Hall)
             DisableTurnScript (id_check)
           }
           case ("Who will my funders be") {
-            msg ("Googface: First, the Admiral (Stevenerico Mostarpularious), weighed down with medals signifying all his great accomplishments.")
-            msg ("Googface: Next, the Genius (Chrysteravegnar Poppylivoginowrbt), the greatest tech guru of our times.")
-            msg ("Googface: Lastly, the Socialite (Amanderye Wischopillorhoffman), who is extremely well-connected.")
-            msg ("")
+            msg ("Googface: First, the Admiral (Stevenerico Mostarpularious), weighed down with medals signifying all his great accomplishments.<br/>")
+            msg ("Googface: Next, the Genius (Chrysteravegnar Poppylivoginowrbt), the greatest tech guru of our times.<br/>")
+            msg ("Googface: Lastly, the Socialite (Amanderye Wischopillorhoffman), who is extremely well-connected.<br/>")
+            msg ("Googface: The amount of money they will fund you for will depend on how much they trust you. You can convince all three to fund you, or focus on two of them to fund you. You must get enough funds to finance your mortgage from what they are willing to contribute.<br/>")
           }
           case ("How much time will I have") {
             msg ("Googface: You will have exactly " + game.time_cycle_count_start + " minutes to convince these demanding investors to provide the capital for your mortgage. I will remind you every minute that passes. You will only get one chance to pitch to them, so make SURE they trust you before you make your pitch.")
-            msg ("")
+            msg ("Googface: Do you think you are ready?<br/>")
           }
         }
       }
     }
-  </function>
+  ]]></function>
   <function name="print_funder_list">
     foreach (funder, myFunderList) {
       PrintCentered ("funder.alias")
@@ -1241,7 +1254,7 @@
     funder.trust = funder.trust + 5
   </function>
   <function name="funding_pitch" parameters="funder"><![CDATA[
-    if (funder.gave_fund = false) {
+    if (funder.pitched = false) {
       if (funder.trust > 0) {
         msg ("You give your best funding pitch to " + funder.article)
         switch (funder) {
@@ -1268,6 +1281,7 @@
     else {
       PrintCentered ("You already gave your pitch to " + funder.article + ", try asking someone else")
     }
+    funder.pitched = true
   ]]></function>
   <function name="change_room" parameters="funder, room"><![CDATA[
     if (game.pov.parent = funder.parent) {
@@ -1568,6 +1582,12 @@
       talk to Googface
       1563
       event:ShowMenuResponse;I am ready now
+    </steps>
+  </walkthrough>
+  <walkthrough name="first_part">
+    <steps type="simplestringlist">
+      check pager
+      check pager
     </steps>
   </walkthrough>
   <timer name="time_cycle">
