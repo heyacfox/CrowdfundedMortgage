@@ -8,7 +8,12 @@
     <firstpublished>2019</firstpublished>
     <feature_asktell />
     <showmoney type="boolean">false</showmoney>
-    <statusattributes type="stringdictionary" />
+    <statusattributes type="stringdictionary">
+      <item>
+        <key>worker_id</key>
+        <value></value>
+      </item>
+    </statusattributes>
     <funds type="int">0</funds>
     <attr name="funds_needed" type="int">100000</attr>
     <attr name="funds_raised" type="boolean">false</attr>
@@ -31,7 +36,10 @@
     <attr name="autodescription_youarein_useprefix" type="boolean">false</attr>
     <autodescription_description_newline />
     <command_newline />
+    <SUPERDEBUG type="boolean">false</SUPERDEBUG>
     <pov type="object">fundee</pov>
+    <attr name="temp_front" type="object">NoOne</attr>
+    <attr name="temp_back" type="object">NoOne</attr>
     <start type="script">
       funds_needed = 100000
       myFunderList = NewObjectList()
@@ -45,9 +53,7 @@
     </start>
     <roomenter type="script">
     </roomenter>
-    <SUPERDEBUG type="boolean">false</SUPERDEBUG>
-    <attr name="temp_front" type="object">NoOne</attr>
-    <attr name="temp_back" type="object">NoOne</attr>
+    <attr name="worker_id">ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad</attr>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -75,6 +81,7 @@
       <visible type="boolean">false</visible>
       <attr name="image_front">alltransparent.png</attr>
       <attr name="image_rear">alltransparent.png</attr>
+      <alias>No one</alias>
     </object>
     <object name="Vase">
       <inherit name="editor_object" />
@@ -109,30 +116,6 @@
       <takemsg>You are given the Fist of Vengeance</takemsg>
       <drop type="boolean">false</drop>
       <look>This is obviously a glove that you can wear, but it has no weight. It looks like the graphics are missing.</look>
-    </object>
-    <object name="fundee">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-      <alias>fundee</alias>
-      <statusattributes type="stringdictionary">
-        <item>
-          <key>funds</key>
-          <value></value>
-        </item>
-        <item>
-          <key>funds_needed</key>
-          <value></value>
-        </item>
-      </statusattributes>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
     </object>
   </object>
   <object name="Gallery">
@@ -623,10 +606,10 @@
     <object name="queen">
       <inherit name="editor_object" />
       <inherit name="namedfemale" />
-      <alias>The Queen</alias>
+      <alias>The One True Googface</alias>
       <scenery type="boolean">false</scenery>
       <usestandardverblist />
-      <look>The Queen exists but cannot be seen.</look>
+      <look>The Googface is everywhere and know where.</look>
       <visible />
       <usedefaultprefix type="boolean">false</usedefaultprefix>
       <gender>they</gender>
@@ -675,6 +658,9 @@
   <object name="apartment">
     <inherit name="editor_room" />
     <firstenter type="script">
+      msg ("You're in your small, dingy apartment. You have been paying 95% of your income in rent for your entire adult life, and the world is mostly run by artificial intelligence (AI) now. There's not that much you can do about your situation, since everything about your life is determined by your Googface data profile. For your entire life you've wanted to take out a mortgage to buy your own place, but banks don't exist anymore so you can't take out a mortgage. One of your friends got a mortgage through a \"special program\", and they viral marketed you into to the program. The invitation looked like a Phishing scam, but you accepted it anyway. You're not exactly sure what happens next...")
+      EnableTimer (pager_buzz)
+      AddToInventory (vr_headset)
     </firstenter>
     <object name="vr_headset">
       <inherit name="editor_object" />
@@ -684,7 +670,28 @@
       <wear_slots type="stringlist">
         <value>head</value>
       </wear_slots>
+      <wear_adjverbs />
+      <where>Seriously? It's right in front of you.</where>
     </object>
+    <object name="pager">
+      <inherit name="editor_object" />
+      <check type="script">
+        msg ("Every person has a specific worker ID, but something went wrong with yours so you had to get a new pager. At least this one doesn't have googstains on it.")
+        msg ("A message appears on the pager.")
+        DisableTimer (pager_buzz)
+        PrintCentered ("CONGRATULATIONS. OUR GRACIOUS LEADER GOOGFACE, AI, HAS ALLOWED YOU TO PARTAKE IN A SPECIAL PROGRAM. THIS IS YOUR ONE CHANCE TO GET A MORTGAGE, DON'T MISS IT. ")
+        PrintCentered ("We have already mapped your headset to the void space, where Googface, our gracious leader, will tell you more.")
+        msg ("All right! You should wear your VR headset.")
+      </check>
+    </object>
+    <turnscript name="wearing_headset">
+      <script><![CDATA[
+        if (GetOuter("head") <> null) {
+          MoveObject (fundee, queen_void)
+        }
+      ]]></script>
+      <enabled />
+    </turnscript>
   </object>
   <object name="queen_void">
     <inherit name="editor_room" />
@@ -693,7 +700,7 @@
     <object name="queen_intro">
       <inherit name="editor_object" />
       <inherit name="namedfemale" />
-      <alias>The Queen</alias>
+      <alias>Googface, AI</alias>
       <gender>they</gender>
       <article>them</article>
       <possessive>theirs</possessive>
@@ -710,32 +717,58 @@
       <speak type="script">
         PrintCentered ("Hello productive member of society")
         firsttime {
-          PrintCentered (fundee.worker_id.value + ", I am glad you decided you are up for this challenge. This is not something to be taken lightly")
-        }
-        otherwise {
-          PrintCentered ("ENTER WORKER ID")
+          first_check
+          PrintCentered ("-------------------------------")
+          PrintCentered ("-------------------------------")
+          PrintCentered ( "WORKAROUND: ENTER WORKER ID")
           get input {
             set (fundee, "worker_id", result)
-            PrintCentered ("Thank you, please wait a moment while I connect to HIVE to verify your information.")
+            PrintCentered ("Thank you, please wait a moment while I connect to the Googface master server to verify your information.")
             SetTimeout (2) {
               queen_questions
             }
           }
+          EnableTurnScript (id_check)
+        }
+        otherwise {
         }
       </speak>
+      <look>The Googface is everywhere and know where.</look>
     </object>
     <exit name="void_exit" alias="out" to="Central Hall">
       <inherit name="outdirection" />
       <visible type="boolean">false</visible>
     </exit>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
+    </object>
   </object>
   <turnscript name="id_check">
-    <enabled />
+    <enabled type="boolean">false</enabled>
     <script><![CDATA[
-      if (IsSwitchedOn(Amand)) {
-        if (fundee.worker_id <> null) {
-          queen_questions
-        }
+      if (fundee.worker_id <> null) {
+        queen_questions
       }
     ]]></script>
   </turnscript>
@@ -763,6 +796,16 @@
     <property>saygoodbyeto</property>
     <pattern>say goodbye to #object#;</pattern>
     <defaultexpression>"You can't say goodbye to #object#; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>check</property>
+    <pattern>check</pattern>
+    <defaultexpression>"You can't check " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>where</property>
+    <pattern>where</pattern>
+    <defaultexpression>"You can't where " + object.article + "."</defaultexpression>
   </verb>
   <function name="tell_finance_topic" parameters="funder">
     set (fundee, "currently_talking_to", funder)
@@ -888,32 +931,34 @@
   ]]></function>
   <function name="queen_questions">
     firsttime {
-      PrintCentered ("I am here to answer any of  your questions. My hive has an infinite amount of time to spend with you to prepare you for this event.")
+      PrintCentered ("I am here to answer any of  your questions. Googface has infinite processing time to spend with you to prepare you for this event.")
       queen_questions
     }
     otherwise {
       ShowMenu ("What do you want to know about?", queen_intro.intro_questions, false) {
         switch (result) {
           case ("Why am I here") {
-            PrintCentered ("You are here because you have a once in a lifetime opportunity. You began your life poor, but you have the chance to obtain a 60 year mortgage to own a home.")
+            PrintCentered ("You will have the opportunity to audition before 3 prestigious individuals who will determine your worthiness as an investment opportunity. You must convince them to allow you the opportunity to be exploited for 60 years in exchange for a home mortgage. This is a great privilege, you should be honored.")
           }
           case ("What should I ask the funders") {
-            PrintCentered ("I would recommend you INTRODUCE YOURSELF TO them. Then, you might want ASK them about himself/herself. That will bring up a number of topics you could discuss with them. Lastly, you might consider to TELL them about your family, finances, or anything else that will show them you are trustworthy to invest in.")
+            PrintCentered ("You should tell them about yourself, and ask them about their selection criteria. Make them feel confident about their decision.")
           }
           case ("How does this work") {
-            PrintCentered ("There will be a number of very wealthy individuals in the space you about to enter. You will need to convince them they should trust you enough that they will provide you funding. After you think you have gained enough trust, you should TELL them YOUR PITCH, and they will decide whether or not you are worthy. They need to know you will be able to pay them back, after all.")
+            PrintCentered ("(remove this)")
           }
           case ("Where will I meet the funders") {
-            PrintCentered ("You will meet the funders in a carefull crafted space, to allow you both to see each other as you are. Feel free to wander around, as they will be doing so too.")
+            PrintCentered ("(remove)")
           }
           case ("Who will my funders be") {
-            PrintCentered ("You will meet your potential funders soon enough. To keep it fair, I will not tell you anything about them until you arrive.")
+            PrintCentered ("First, the Admiral (Stevenerico Mostarpularious), weighed down with medals signifying all his great accomplishments.")
+            PrintCentered ("Next, the Genius (Chrysteravegnar Poppylivoginowrbt), the greatest tech guru of our times.")
+            PrintCentered ("Lastly, the Socialite (Amanderye Wischopillorhoffman), who is extremely well-connected.")
           }
           case ("I am ready now") {
             MoveObject (fundee, Central Hall)
           }
           case ("How much time will I have") {
-            PrintCentered ("You will have exactly " + game.time_cycle_count_start + " minutes to raise enough funds for your mortgage. I will remind you every minute that passes. Don't pitch too soon, after you deliver your pitch you will not get another chance.")
+            PrintCentered ("You will have exactly " + game.time_cycle_count_start + " minutes to convince these demanding investors to provide the capital for your mortgage. I will remind you every minute that passes. You will only get one chance to pitch to them")
           }
         }
       }
@@ -952,12 +997,13 @@
   <function name="change_room" parameters="funder, room"><![CDATA[
     if (game.pov.parent = funder.parent) {
       msg (funder.alias + " leaves the room.")
+      ImageOrderLogic
     }
     if (fundee.currently_talking_to <> funder) {
       MoveObject (funder, room)
       if (game.pov.parent = room) {
         msg (funder.alias + " enters " + room.alias)
-        invoke (funder.image_rear)
+        ImageOrderLogic
       }
     }
   ]]></function>
@@ -1034,23 +1080,9 @@
   <function name="show_correct_image">
   </function>
   <function name="change_picture_frame" parameters="front_char, back_char, room"><![CDATA[
-    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 500px; height: 500px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:500px;'/>")
-    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 500px; height: 500px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:500px;'/></div>")
-    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 500px; height: 500px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:500px;'/>")
-    msg ("<img src='" + GetFileURL("alltransparent.png") + "' style='float:top;width:500px;'/>")
-    if (game.pov.parent = Central Hall) {
-      change_picture_frame
-    }
-    else if (game.pov.parent = Gallery) {
-    }
-    else if (game.pov.parent = Patio) {
-    }
-    if (ListContains(ScopeVisible(), Steve)) {
-    }
-    if (ListContains(ScopeVisible(), Chrys)) {
-    }
-    if (ListContains(ScopeVisible(), Amand)) {
-    }
+    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:300px;'/>")
+    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:300px;'/></div>")
+    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:300px;'/>")
   ]]></function>
   <function name="ImageOrderLogic">
     game.temp_front = NoOne
@@ -1090,8 +1122,12 @@
         game.temp_back = NoOne
       }
     }
-    change_picture_frame (game.temp_front, game.temp_back, fundee.parent)
-    msg("here is a message" + game.temp_front.alias + " and " + game.temp_back.alias + " and " + fundee.parent.alias + "!")
+    if (fundee.parent = Gallery or fundee.parent = Central Hall or fundee.parent = Patio) {
+      change_picture_frame (game.temp_front, game.temp_back, fundee.parent)
+    }
+  </function>
+  <function name="first_check">
+    PrintCentered (fundee.worker_id.value + ", I am glad you decided you are up for this challenge. This is not something to be taken lightly")
   </function>
   <walkthrough name="testing">
     <steps type="simplestringlist">
@@ -1270,6 +1306,13 @@
     <interval>1</interval>
     <enabled type="boolean">false</enabled>
     <script>
+    </script>
+  </timer>
+  <timer name="pager_buzz">
+    <interval>10</interval>
+    <enabled type="boolean">false</enabled>
+    <script>
+      msg ("Your pager buzzes. You should check it.")
     </script>
   </timer>
 </asl>
