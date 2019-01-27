@@ -25,7 +25,7 @@
     <custompaddingright type="int">10</custompaddingright>
     <custompaddingleft type="int">10</custompaddingleft>
     <setcustomwidth />
-    <customwidth type="int">1200</customwidth>
+    <customwidth type="int">900</customwidth>
     <attr name="time_cycle_count_start" type="int">10</attr>
     <povstatusattributes type="stringdictionary" />
     <defaultforeground>Black</defaultforeground>
@@ -54,6 +54,7 @@
     </start>
     <roomenter type="script">
     </roomenter>
+    <turnoffcompass />
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -70,11 +71,8 @@
     <enter type="script">
       ImageOrderLogic
     </enter>
-    <exit alias="west" to="Patio">
-      <inherit name="westdirection" />
-    </exit>
-    <exit alias="east" to="Gallery">
-      <inherit name="eastdirection" />
+    <exit name="Exit to Patio" alias="through the door to the patio" to="Patio">
+      <inherit name="northdirection" />
     </exit>
     <object name="NoOne">
       <inherit name="editor_object" />
@@ -89,22 +87,21 @@
       <usestandardverblist />
       <take />
       <takemsg>You try to take the vase</takemsg>
-      <grasb type="script">
+      <grasb type="script"><![CDATA[
         MakeObjectVisible (Fist)
         AddToInventory (Fist)
-        msg ("Weird...some sort of glove thing? Maybe you should wear it.")
-      </grasb>
+        msg ("Weird...some sort of <a style=\"color:Blue\" class=\"cmdlink elementmenu\" data-elementid=\"Fist\" data-verbs=\"wear\">glove</a> thing? Maybe you should wear it. .")
+      ]]></grasb>
       <admire type="script">
         msg ("You admire the vase, taking in the eloquent design.")
       </admire>
-      <lift type="script">
-      </lift>
       <ontake type="script">
         msg ("You lift the vase, revealing something underneath.")
         picture ("debugroom_detail.png")
         msg ("The vase is very heavy, so you set it back down.")
         Vase.parent = Central Hall
       </ontake>
+      <look>You had better not pick this up. If you break it, all your future generations will be paying for your debt.</look>
     </object>
     <object name="Fist">
       <inherit name="editor_object" />
@@ -126,6 +123,33 @@
         <value>glove</value>
       </alt>
     </object>
+    <exit alias="up the stairs to the gallery" to="Gallery">
+      <inherit name="updirection" />
+    </exit>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
+    </object>
   </object>
   <object name="Gallery">
     <inherit name="editor_room" />
@@ -136,9 +160,7 @@
     <enter type="script">
       ImageOrderLogic
     </enter>
-    <exit alias="west" to="Central Hall">
-      <inherit name="westdirection" />
-    </exit>
+    <description>Beautiful paintings surround you.</description>
     <object name="Amand">
       <inherit name="editor_object" />
       <inherit name="namedfemale" />
@@ -177,15 +199,6 @@
           trust_increase_medium (this)
         }
       </introduceyourselfto>
-      <tell type="scriptdictionary">
-        <item key="your finances">
-        </item>
-        <item key="your parents; your family">
-        </item>
-        <item key="your pitch">
-        </item>
-      </tell>
-      <ask type="scriptdictionary" />
       <gems type="script">
         firsttime {
           msg ("\"Oh these? Gorgeous aren't they? My husband gave them to be as a half-year anniversary of our wedding. Don't you think they bring out my eyes?\"")
@@ -237,6 +250,17 @@
           already_talked (this)
         }
       </yourfamily>
+      <tell type="scriptdictionary">
+        <item key="your finances">
+        </item>
+        <item key="your parents; your family">
+        </item>
+        <item key="your pitch">
+        </item>
+      </tell>
+      <ask type="scriptdictionary" />
+      <look>Socialite Amanderye Wischopillorhoffman practically glows with the light bouncing off her jewels.</look>
+      <speak>"Isn't this place gorgeous?"</speak>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -249,6 +273,7 @@
         portrait.parent = Gallery
         msg ("It disappears from your hands and reappears on the wall")
       </ontake>
+      <look>For some reason, the person in the portrait looks familiar. </look>
     </object>
     <object name="landscape">
       <inherit name="editor_object" />
@@ -262,6 +287,7 @@
         landscape.parent = Gallery
         msg ("It disappears from your hands and reappears on the wall")
       </ontake>
+      <look>This is too beautiful, you would never see this in real life.</look>
     </object>
     <object name="abstract">
       <inherit name="editor_object" />
@@ -271,13 +297,17 @@
       <takemsg>You try to pull it off the wall. It seems like there was something behind it</takemsg>
       <usestandardverblist />
       <ontake type="script">
-        picture ("pager_detail.png")
+        picture ("ocean_detail.png")
         abstract.parent = Gallery
         msg ("It disappears from your hands and reappears on the wall")
       </ontake>
       <lift type="script">
       </lift>
+      <look><![CDATA[You tilt your head sideways. Maybe it's a Jackson Pollock?<br/><br/>"Hm."]]></look>
     </object>
+    <exit alias="down the stairs to the hall" to="Central Hall">
+      <inherit name="downdirection" />
+    </exit>
   </object>
   <object name="Patio">
     <inherit name="editor_room" />
@@ -290,10 +320,10 @@
     <enter type="script">
       ImageOrderLogic
     </enter>
-    <exit alias="east" to="Central Hall">
+    <exit alias="back through the door to the hall" to="Central Hall">
       <inherit name="eastdirection" />
     </exit>
-    <exit name="debug_path" alias="west" to="Debug">
+    <exit name="debug_path" alias="through the ocean" to="Debug">
       <inherit name="westdirection" />
       <locked type="boolean">false</locked>
       <visible type="boolean">false</visible>
@@ -307,6 +337,7 @@
         if (GetOuter("hand") <> null) {
           msg ("You punch the ocean. It looks like there is a room behind where the ocean used to be.")
           MakeExitVisible (debug_path)
+          HandleSingleCommand ("look")
         }
         else {
           PrintCentered ("What makes you think that can be punched?")
@@ -351,11 +382,6 @@
           trust_decrease_small (this)
         }
       </introduceyourselfto>
-      <ask type="scriptdictionary">
-        <item key="watch">
-        </item>
-      </ask>
-      <tell type="scriptdictionary" />
       <hiscompany type="script">
         firsttime {
           msg ("\"I've got this great startup, and what we do is get game atheletes these shirts that flash a different ad every 8 seconds.")
@@ -422,6 +448,12 @@
       <makeyourfundingpitch type="script">
         funding_pitch (this)
       </makeyourfundingpitch>
+      <ask type="scriptdictionary">
+        <item key="watch">
+        </item>
+      </ask>
+      <tell type="scriptdictionary" />
+      <speak>"I'm too cool to be here."</speak>
     </object>
     <object name="Steve">
       <inherit name="editor_object" />
@@ -439,9 +471,7 @@
       <attr name="gave_fund" type="boolean">false</attr>
       <attr name="image_front">Steve_front.png</attr>
       <attr name="image_rear">Steve_rear.png</attr>
-      <look type="script">
-        invoke (this.image_rear)
-      </look>
+      <look>Admiral Stevenerico Mostarpularious looks regal with his uniform.</look>
       <thank type="script">
         if (GetBoolean(fundee, "funds_raised")) {
           msg ("\"It is my honor to sponsor a fellow voyager through the universe\"")
@@ -467,7 +497,7 @@
       <introduceyourselfto type="script">
         firsttime {
           msg ("AHOY, " + fundee.worker_id + "!")
-          trust_increase_small
+          trust_increase_small (this)
         }
       </introduceyourselfto>
       <hisfather type="script">
@@ -489,8 +519,6 @@
         msg ("\"Ahoy!\"")
         set (fundee, "currently_talking_to", fundee)
       </speak>
-      <ask type="scriptdictionary" />
-      <tell type="scriptdictionary" />
       <hisboat type="script">
         firsttime {
           msg ("\"Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with the high sees and crashed it. My father was graciously forgiving about that.\"")
@@ -557,6 +585,20 @@
       <makeyourfundingpitch type="script">
         funding_pitch (this)
       </makeyourfundingpitch>
+      <ask type="scriptdictionary" />
+      <tell type="scriptdictionary" />
+      <favoritecocktail type="script">
+        firsttime {
+          msg ("\"Of course it has to be rum. Isn't it obvious from the color of my face? No sailor would be caught with a fruity beverage on the high seas.\"")
+          trust_decrease_medium (this)
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_decrease_small (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </favoritecocktail>
     </object>
   </object>
   <turnscript name="CheckForAmount">
@@ -613,7 +655,7 @@
     <inherit name="editor_room" />
     <descprefix type="string"></descprefix>
     <description>NOTE: IF YOU ARE HERE THEN THIS IS A DEV BUILD. GREP HAS THE LIST OF DEBUG COMMANDS YOU CAN USE WHILE YOU ARE IN HERE.</description>
-    <exit alias="east" to="Patio">
+    <exit alias="through the ocean to the patio" to="Patio">
       <inherit name="eastdirection" />
       <locked type="boolean">false</locked>
       <lockmessage type="string"></lockmessage>
@@ -625,31 +667,33 @@
       <inherit name="namedfemale" />
       <alias>The One True Googface</alias>
       <scenery type="boolean">false</scenery>
-      <usestandardverblist />
+      <usestandardverblist type="boolean">false</usestandardverblist>
       <look>The Googface is everywhere and know where.</look>
       <visible />
       <usedefaultprefix type="boolean">false</usedefaultprefix>
       <gender>they</gender>
       <article>them</article>
       <possessive>theirs</possessive>
-      <ask type="scriptdictionary">
-        <item key="love">
-          foreach (funder, game.myTrueFunderList) {
-            PrintCentered ("DEBUG: ALL FUNDER TRUST AT MAX")
-            funder.trust = 100
-          }
-        </item>
-        <item key="hate">
-          PrintCentered ("DEBUG: ALL FUNDER TRUST AT MINIMUM")
-          foreach (funder, game.myTrueFunderList) {
-            funder.trust = -100
-          }
-        </item>
-        <item key="being rich">
-          PrintCentered ("DEBUG: FUNDS SET TO EXACT AMOUNT")
-          fundee.funds = fundee.funds_needed
-        </item>
-      </ask>
+      <askaboutlove type="script">
+        foreach (funder, game.myTrueFunderList) {
+          funder.trust = 100
+          msg ("Googface: DEBUG: ALL FUNDER TRUST AT MAX")
+        }
+      </askaboutlove>
+      <askabouthate type="script">
+        msg ("Googface: DEBUG: ALL FUNDER TRUST AT MINIMUM")
+        foreach (funder, game.myTrueFunderList) {
+          funder.trust = -100
+        }
+      </askabouthate>
+      <askaboutbeingrich type="script">
+        msg ("Googface: DEBUG: FUNDS SET TO EXACT AMOUNT")
+        fundee.funds = fundee.funds_needed
+      </askaboutbeingrich>
+      <ask type="scriptdictionary" />
+      <displayverbs type="stringlist">
+        <value>Look at</value>
+      </displayverbs>
     </object>
   </object>
   <verb>
@@ -675,6 +719,7 @@
   <object name="apartment">
     <inherit name="editor_room" />
     <firstenter type="script">
+      picture ("apartment.png")
       msg ("You're in your small, dingy apartment. You have been paying 95% of your income in rent for your entire adult life, and the world is mostly run by artificial intelligence (AI) now. There's not that much you can do about your situation, since everything about your life is determined by your Googface data profile. For your entire life you've wanted to take out a mortgage to buy your own place, but banks don't exist anymore so you can't take out a mortgage. One of your friends got a mortgage through a \"special program\", and they viral marketed you into to the program. The invitation looked like a Phishing scam, but you accepted it anyway. You're not exactly sure what happens next...")
       EnableTimer (pager_buzz)
       AddToInventory (vr_headset)
@@ -690,17 +735,29 @@
       <wear_adjverbs />
       <where>Seriously? It's right in front of you.</where>
       <drop type="boolean">false</drop>
+      <visible type="boolean">false</visible>
+      <look>It's a 40 year old model, but it gets the job done. You had to put some duct tape on the straps so that it was still wearable.</look>
     </object>
     <object name="pager">
       <inherit name="editor_object" />
-      <check type="script">
+      <check type="script"><![CDATA[
         msg ("Every person has a specific worker ID, but something went wrong with yours so you had to get a new pager. At least this one doesn't have googstains on it.")
         msg ("A message appears on the pager.")
         DisableTimer (pager_buzz)
         PrintCentered ("CONGRATULATIONS. OUR GRACIOUS LEADER GOOGFACE, AI, HAS ALLOWED YOU TO PARTAKE IN A SPECIAL PROGRAM. THIS IS YOUR ONE CHANCE TO GET A MORTGAGE, DON'T MISS IT. ")
         PrintCentered ("We have already mapped your headset to the void space, where Googface, our gracious leader, will tell you more.")
-        msg ("All right! You should wear your VR headset.")
-      </check>
+        msg ("All right, you should wear your <a style=\"color:Blue\" class=\"cmdlink elementmenu\" data-elementid=\"vr_headset\" data-verbs=\"wear\">VR Headset</a>.")
+        MakeObjectVisible (vr_headset)
+        if (GetBoolean(pager, "end_game")) {
+        }
+        else if (GetBoolean(pager, "begin_game")) {
+        }
+        else {
+          msg ("You don't feel like reading your spam messages now.;")
+        }
+      ]]></check>
+      <look>You have 854 messages unread. Most of them are targeted ads based on your Googface data profile.</look>
+      <alias>pager</alias>
     </object>
     <turnscript name="wearing_headset">
       <enabled />
@@ -711,30 +768,6 @@
         }
       ]]></script>
     </turnscript>
-    <object name="fundee">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-      <alias>fundee</alias>
-      <statusattributes type="stringdictionary">
-        <item>
-          <key>funds</key>
-          <value></value>
-        </item>
-        <item>
-          <key>funds_needed</key>
-          <value></value>
-        </item>
-      </statusattributes>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
-    </object>
   </object>
   <object name="queen_void">
     <inherit name="editor_room" />
@@ -765,7 +798,7 @@
           PrintCentered ("WORKAROUND: ENTER WORKER ID")
           get input {
             set (fundee, "worker_id", result)
-            SetTimeout (2) {
+            SetTimeout (1) {
               queen_questions
             }
             msg ("Googface: Thank you, please wait a moment while I connect to the Googface master server to verify your information.")
@@ -896,6 +929,36 @@
     <property>hiswatch</property>
     <pattern>his watch</pattern>
     <defaultexpression>"You can't his watch " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>askaboutlove</property>
+    <pattern>ask about love;</pattern>
+    <defaultexpression>"You can't ask about love; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>askabouthate</property>
+    <pattern>ask about hate;</pattern>
+    <defaultexpression>"You can't ask about hate; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>askaboutbeingrich</property>
+    <pattern>ask about being rich;</pattern>
+    <defaultexpression>"You can't ask about being rich; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>love</property>
+    <pattern>love</pattern>
+    <defaultexpression>"You can't love " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>booze</property>
+    <pattern>booze</pattern>
+    <defaultexpression>"You can't booze " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>favoritecocktail</property>
+    <pattern>favorite cocktail;</pattern>
+    <defaultexpression>"You can't favorite cocktail; " + object.article + "."</defaultexpression>
   </verb>
   <function name="tell_finance_topic" parameters="funder">
     set (fundee, "currently_talking_to", funder)
@@ -1046,7 +1109,7 @@
             msg ("")
           }
           case ("How much time will I have") {
-            msg ("Googface: You will have exactly " + game.time_cycle_count_start + " minutes to convince these demanding investors to provide the capital for your mortgage. I will remind you every minute that passes. You will only get one chance to pitch to them")
+            msg ("Googface: You will have exactly " + game.time_cycle_count_start + " minutes to convince these demanding investors to provide the capital for your mortgage. I will remind you every minute that passes. You will only get one chance to pitch to them, so make SURE they trust you before you make your pitch.")
             msg ("")
           }
         }
@@ -1070,9 +1133,19 @@
     if (funder.gave_fund = false) {
       if (funder.trust > 0) {
         msg ("You give your best funding pitch to " + funder.article)
+        switch (funder) {
+          case (Steve) {
+            msg ("Feeling like you gained his trust, you strike your best Captain Morgan stance and stare into the sun, \"You know captain, life is like being at sea. It's rough, hard, and really expensive. To best the waves, all you have to rely on is your boat. Your boat is your home, and right now all I have is a crusty, leaky, studio-sized dingy in a turgid swamp in the Everglades. but with your help, I can sail out into the world in a mighty frigate and return with treasures that would make our fathers proud.\" <br/><br/>He nods, and places his hand on your shoulder.")
+          }
+          case (Amand) {
+          }
+          case (Chrys) {
+          }
+        }
         msg ("Thankfully, " + funder.alias + " says, \"Alright, I can go in for that\"")
         funder.gave_fund = true
         fundee.funds = fundee.funds + funder.trust * 1000
+        msg ("You now have " + fundee.funds + " out of the " + fundee.funds_needed + " that you need.")
       }
       else {
         msg ("Ugh, " + funder.gender + " grumbles. You're insufferable, you know that?")
@@ -1108,7 +1181,7 @@
       change_room (Chrys, Gallery)
     }
     SetTimeout (game.time_cycle_count_start * 60 *  5 / 12) {
-      change_room (Chrys, Gallery)
+      change_room (Steve, Central Hall)
     }
     SetTimeout (game.time_cycle_count_start * 60 *  7 / 12) {
       change_room (Amand, Gallery)
@@ -1120,7 +1193,7 @@
       change_room (Chrys, Central Hall)
     }
     SetTimeout (game.time_cycle_count_start * 60 *  10 / 12) {
-      change_room (Steve, Patio)
+      change_room (Amand, Central Hall)
     }
   </function>
   <function name="trust_increase_medium" parameters="funder">
@@ -1148,13 +1221,14 @@
     msg ("You take off the VR headset. You're out. Now what?")
     MoveObject (fundee, apartment)
     EnableTimer (pager_buzz2)
+    SetObjectFlagOn (pager, "end_game")
   </function>
   <function name="show_correct_image">
   </function>
   <function name="change_picture_frame" parameters="front_char, back_char, room"><![CDATA[
-    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:300px;'/>")
-    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:300px;'/></div>")
-    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:300px;'/>")
+    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 400px; height: 400px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:400px;'/>")
+    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 400px; height: 400px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:400px;'/></div>")
+    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 400px; height: 400px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:400px;'/>")
   ]]></function>
   <function name="ImageOrderLogic">
     game.temp_front = NoOne
@@ -1387,14 +1461,12 @@
     <interval>60</interval>
     <enabled type="boolean">false</enabled>
     <script><![CDATA[
-      SetTimerInterval (time_cycle, 60)
+      game.time_cycle_count = game.time_cycle_count - 1
       if (game.time_cycle_count > 1) {
-        game.time_cycle_count = game.time_cycle_count - 1
-        PrintCentered ("You have " + game.time_cycle_count + " minutes remaining")
+        msg ("Googface: You have " + game.time_cycle_count + " minutes remaining")
       }
       else if (game.time_cycle_count = 1) {
-        game.time_cycle_count = game.time_cycle_count - 1
-        PrintCentered ("You have " + game.time_cycle_count + " minute remaining. These are important people! We can't have you wasting their time")
+        msg ("Googface: You have " + game.time_cycle_count + " minute remaining. These are important people! We can't have you wasting their time")
       }
       else if (game.time_cycle_count = 0) {
         DisableTimer (time_cycle)
@@ -1415,14 +1487,16 @@
   <timer name="pager_buzz">
     <interval>10</interval>
     <enabled type="boolean">false</enabled>
-    <script>
-      msg ("Your pager buzzes. You should check it.")
-    </script>
+    <script><![CDATA[
+      msg ("Your <a style=\"color:Blue\" class=\"cmdlink elementmenu\" data-elementid=\"pager\" data-verbs=\"check\">pager</a> buzzes. You should check it.")
+      SetObjectFlagOn (pager, "begin_game")
+    ]]></script>
   </timer>
   <timer name="pager_buzz2">
     <interval>10</interval>
-    <script>
-      msg ("Your pager buzzes. You should check it.")
-    </script>
+    <script><![CDATA[
+      msg ("Your <a style=\"color:Blue\" class=\"cmdlink elementmenu\" data-elementid=\"pager\" data-verbs=\"check\">pager</a> has started buzzing again. You should check it.")
+      SetObjectFlagOn (pager, "end_game")
+    ]]></script>
   </timer>
 </asl>
