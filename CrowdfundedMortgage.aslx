@@ -1077,9 +1077,9 @@
   <function name="show_correct_image">
   </function>
   <function name="change_picture_frame" parameters="front_char, back_char, room"><![CDATA[
-    msg ("<div style='position:absolute; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:300px;'/>")
-    msg ("<div style='position:absolute; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:300px;'/></div>")
-    msg ("<div style='position:absolute; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:300px;'/>")
+    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:300px;'/>")
+    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:300px;'/></div>")
+    msg ("<div style='position:fixed; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:300px;'/>")
   ]]></function>
   <function name="ImageOrderLogic">
     game.temp_front = NoOne
