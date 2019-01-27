@@ -261,6 +261,36 @@
         </item>
       </tell>
       <ask type="scriptdictionary" />
+      <feelings type="script">
+        firsttime {
+          msg ("\"No thank you. I'm very happy with my diamonds right now\"")
+          trust_increase_small (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_small (Chrys)
+          }
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_small (Steve)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </feelings>
+      <pets type="script">
+        firsttime {
+          msg ("\"I only have pets with this highest level of pedigree\"")
+          trust_increase_small (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_small (Chrys)
+          }
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_small (Steve)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </pets>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -466,6 +496,21 @@
           already_talked (this)
         }
       </feelings>
+      <pets type="script">
+        firsttime {
+          msg ("\"It better have a programmable chip implanted.\"")
+          trust_decrease_small (this)
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_small (Steve)
+          }
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_increase_small (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </pets>
     </object>
     <object name="Steve">
       <inherit name="editor_object" />
@@ -611,6 +656,18 @@
       </favoritecocktail>
       <ask type="scriptdictionary" />
       <tell type="scriptdictionary" />
+      <pets type="script">
+        firsttime {
+          msg ("\"My father had many mastiffs on his vessels, who I grew very fond of over time. My main mastiff's name was named Dreadnought.\"")
+          trust_increase_medium (this)
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_increase_small (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </pets>
     </object>
   </object>
   <turnscript name="CheckForAmount">
@@ -976,6 +1033,16 @@
     <property>feelings</property>
     <pattern>feelings</pattern>
     <defaultexpression>"You can't feelings " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>animals</property>
+    <pattern>animals</pattern>
+    <defaultexpression>"You can't animals " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>pets</property>
+    <pattern>pets</pattern>
+    <defaultexpression>"You can't pets " + object.article + "."</defaultexpression>
   </verb>
   <function name="tell_finance_topic" parameters="funder">
     set (fundee, "currently_talking_to", funder)
