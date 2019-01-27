@@ -1404,23 +1404,23 @@
   </function>
   <function name="final_check"><![CDATA[
     if (fundee.funds > fundee.funds_needed - 1) {
-      msg ("Congratulations, you raised a total of $" + fundee.funds + "! It looks like you be able to own your own home after 60 years!")
+      msg ("Googface: Congratulations, you raised a total of $" + fundee.funds + "! It looks like you be able to own your own home after 60 years!")
       foreach (funder, game.myTrueFunderList) {
         if (funder.thanked = true) {
           IncreaseObjectCounter (fundee, "funders")
         }
       }
-      msg ("You will be paying to the following [" + fundee.funders + "] funders.")
+      msg ("Googface: You will be paying to the following [" + fundee.funders + "] funders.")
       foreach (funder, game.myTrueFunderList) {
         if (funder.thanked = true) {
           msg ("Funder: " + funder.alias)
         }
       }
-      msg ("\"Your children after you will speak of you in their stories and legends. Prepare for your first step out of commonality and into greatness\"")
+      msg ("Googface: Your children after you will speak of you in their stories and legends. Prepare for your first step out of commonality and into greatness")
       finish
     }
     else {
-      msg ("Although you did not raise enough money to finance your mortgage, do not feel ashamed. Only 5% of total participants raise enough funds. For the rest of your life, you are still expected to remain productive while we take 95% of your input for rent. Enjoy the rest of your life.")
+      msg ("Googface: Although you did not raise enough money to finance your mortgage, do not feel ashamed. Only 5% of total participants raise enough funds. For the rest of your life, you are still expected to remain productive while we take 95% of your input for rent. Enjoy the rest of your life.")
       finish
     }
     DisableTimer (pager_buzz2)
