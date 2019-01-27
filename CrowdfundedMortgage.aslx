@@ -56,6 +56,8 @@
     <roomenter type="script">
     </roomenter>
     <gridmap type="boolean">false</gridmap>
+    <menufontsize type="int">14</menufontsize>
+    <customstatuspane />
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -68,6 +70,7 @@
       PrintCentered ("You have " + game.time_cycle_count + " minutes remaining. Good luck!")
       EnableTimer (time_cycle)
       all_moves
+      JS.setCustomStatus ("Objective: Talk to the funders in the rooms and get them to trust you, then make your pitch to them. Make sure you get enough funds. You can only make 1 pitch to them, so make sure you get a lot of trust before you try it.")
     </firstenter>
     <enter type="script">
       ImageOrderLogic
@@ -127,30 +130,6 @@
     <exit alias="up" to="Gallery">
       <inherit name="updirection" />
     </exit>
-    <object name="fundee">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-      <alias>fundee</alias>
-      <statusattributes type="stringdictionary">
-        <item>
-          <key>funds</key>
-          <value></value>
-        </item>
-        <item>
-          <key>funds_needed</key>
-          <value></value>
-        </item>
-      </statusattributes>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
-    </object>
   </object>
   <object name="Gallery">
     <inherit name="editor_room" />
@@ -198,7 +177,7 @@
       </thank>
       <introduceyourselfto type="script">
         firsttime {
-          msg ("A please to meet you, " + fundee.worker_id + ". I am a person of the highest culture, with all the best gems and luxury.")
+          msg ("A pleasure to meet you, " + fundee.worker_id + ". I am a person of the highest culture, with all the best gems and luxury.")
           trust_increase_medium (this)
         }
       </introduceyourselfto>
@@ -265,7 +244,7 @@
       <feelings type="script">
         firsttime {
           msg ("\"No thank you. I'm very happy with my diamonds right now\"")
-          trust_increase_small (this)
+          trust_decrease_small (this)
           if (ListContains(ScopeVisible(), Chrys)) {
             trust_decrease_small (Chrys)
           }
@@ -591,7 +570,6 @@
       </hisfather>
       <speak type="script">
         msg ("\"Ahoy!\"")
-        set (fundee, "currently_talking_to", fundee)
       </speak>
       <hisboat type="script">
         firsttime {
@@ -854,6 +832,30 @@
         }
       ]]></script>
     </turnscript>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
+    </object>
   </object>
   <object name="queen_void">
     <inherit name="editor_room" />
@@ -1067,7 +1069,6 @@
     <defaultexpression>"You can't fitness " + object.article + "."</defaultexpression>
   </verb>
   <function name="tell_finance_topic" parameters="funder">
-    set (fundee, "currently_talking_to", funder)
     if (GetBoolean(funder, "tell_finance")) {
       msg ("funder.alias + \"says, \\"You already talked to me about that.\\"\"")
       trust_decrease_small (funder)
@@ -1075,7 +1076,7 @@
     else {
       ShowMenu ("What do you want to tell " + funder.alias + " about your finances", fundee.finance_topics, false) {
         if (result = "how much money your parents have") {
-          switch (fundee.currently_talking_to) {
+          switch (funder) {
             case (Steve) {
               msg ("\"That's a real shame, you can work on my boat if you need some extra dough to save up for a sailboat\"")
               trust_increase_small (Steve)
@@ -1109,7 +1110,7 @@
           }
         }
         else if (result = "how frugal you are with your spending") {
-          switch (fundee.currently_talking_to) {
+          switch (funder) {
             case (Steve) {
               msg ("\"Brilliant! I know a lot about being frugal. When you are on a ship for 180 days sailing around the world you have to pay close attention to every resource you have.\"")
               trust_increase_medium (Steve)
@@ -1143,7 +1144,7 @@
           }
         }
         else if (result = "how you make your credit payments early every month") {
-          switch (fundee.currently_talking_to) {
+          switch (funder) {
             case (Steve) {
               msg ("\"But then how will you spend it on things that really matter?\"")
               trust_decrease_medium (Steve)
@@ -1229,7 +1230,7 @@
   </function>
   <function name="already_talked" parameters="funder">
     msg ("You see " + funder.gender + " looks disgruntled, \"I already talked to you about that.\"")
-    trust_increase_small (funder)
+    trust_decrease_small (funder)
   </function>
   <function name="trust_increase_small" parameters="funder">
     msg (funder.alias + " looks like " + funder.gender + " trusts you a little more.")
