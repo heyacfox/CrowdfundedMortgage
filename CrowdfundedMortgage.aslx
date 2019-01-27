@@ -2,7 +2,7 @@
 <asl version="580">
   <include ref="English.aslx" />
   <include ref="Core.aslx" />
-  <game name="The Five Minute Mortgage">
+  <game name="The Ten Minute Mortgage">
     <gameid>29b9a270-50ba-4aa5-954b-714bfbbb8d2e</gameid>
     <version>1.0</version>
     <firstpublished>2019</firstpublished>
@@ -17,7 +17,7 @@
     <funds type="int">0</funds>
     <attr name="funds_needed" type="int">100000</attr>
     <attr name="funds_raised" type="boolean">false</attr>
-    <attr name="time_cycle_count" type="int">5</attr>
+    <attr name="time_cycle_count" type="int">10</attr>
     <category>Surreal</category>
     <enablehyperlinks />
     <turnoffplacesandobjects />
@@ -26,7 +26,7 @@
     <custompaddingleft type="int">10</custompaddingleft>
     <setcustomwidth />
     <customwidth type="int">1200</customwidth>
-    <attr name="time_cycle_count_start" type="int">5</attr>
+    <attr name="time_cycle_count_start" type="int">10</attr>
     <povstatusattributes type="stringdictionary" />
     <defaultforeground>Black</defaultforeground>
     <defaultbackground>BlanchedAlmond</defaultbackground>
@@ -87,18 +87,24 @@
       <inherit name="editor_object" />
       <feature_container />
       <usestandardverblist />
+      <take />
+      <takemsg>You try to take the vase</takemsg>
       <grasb type="script">
         MakeObjectVisible (Fist)
         AddToInventory (Fist)
+        msg ("Weird...some sort of glove thing? Maybe you should wear it.")
       </grasb>
       <admire type="script">
         msg ("You admire the vase, taking in the eloquent design.")
       </admire>
       <lift type="script">
+      </lift>
+      <ontake type="script">
         msg ("You lift the vase, revealing something underneath.")
         picture ("debugroom_detail.png")
         msg ("The vase is very heavy, so you set it back down.")
-      </lift>
+        Vase.parent = Central Hall
+      </ontake>
     </object>
     <object name="Fist">
       <inherit name="editor_object" />
@@ -116,30 +122,9 @@
       <takemsg>You are given the Fist of Vengeance</takemsg>
       <drop type="boolean">false</drop>
       <look>This is obviously a glove that you can wear, but it has no weight. It looks like the graphics are missing.</look>
-    </object>
-    <object name="fundee">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-      <alias>fundee</alias>
-      <statusattributes type="stringdictionary">
-        <item>
-          <key>funds</key>
-          <value></value>
-        </item>
-        <item>
-          <key>funds_needed</key>
-          <value></value>
-        </item>
-      </statusattributes>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
+      <alt type="stringlist">
+        <value>glove</value>
+      </alt>
     </object>
   </object>
   <object name="Gallery">
@@ -168,10 +153,12 @@
         if (GetOuter("hand") <> null) {
           msg ("You punch through Amand. She turns into a pile of miniature feather boas and drifts to the floor")
           list remove (game.myTrueFunderList, Amand)
+          MakeObjectInvisible (Amand)
+          ImageOrderLogic
         }
         else {
           msg ("You put your dukes up and wind up for a big punch.")
-          PrintCentered ("I'm pretty sure you don't want to do that.")
+          PrintCentered ("Googface: I'm pretty sure you don't want to do that.")
           msg ("You put your hands back down.")
         }
       ]]></punch>
@@ -186,86 +173,94 @@
       </thank>
       <introduceyourselfto type="script">
         firsttime {
-          msg ("A please to meet you, " + fundee.worker_id)
-          trust_increase_medium
+          msg ("A please to meet you, " + fundee.worker_id + ". I am a person of the highest culture, with all the best gems and luxury.")
+          trust_increase_medium (this)
         }
       </introduceyourselfto>
       <tell type="scriptdictionary">
         <item key="your finances">
-          tell_finance_topic (this)
         </item>
         <item key="your parents; your family">
-          firsttime {
-            msg ("\"While they did not have much, maybe they had love for you?\"")
-            trust_increase_small (this)
-            if (ListContains(ScopeVisible(), Chrys)) {
-              trust_decrease_medium (Chrys)
-            }
-            if (ListContains(ScopeVisible(), Steve)) {
-              trust_increase_medium (Steve)
-            }
-          }
-          otherwise {
-            already_talked (this)
-          }
         </item>
         <item key="your pitch">
-          funding_pitch (this)
         </item>
       </tell>
-      <ask type="scriptdictionary">
-        <item key="gems jewelry diamonds rubies">
-          firsttime {
-            msg ("\"Oh these? Gorgeous aren't they? My husband gave them to be as a half-year anniversary of our wedding. Don't you think they bring out my eyes?\"")
-            trust_increase_large (this)
-            if (ListContains(ScopeVisible(), Chrys)) {
-              trust_decrease_small (Chrys)
-            }
-            if (ListContains(ScopeVisible(), Steve)) {
-              trust_increase_small (Steve)
-            }
+      <ask type="scriptdictionary" />
+      <gems type="script">
+        firsttime {
+          msg ("\"Oh these? Gorgeous aren't they? My husband gave them to be as a half-year anniversary of our wedding. Don't you think they bring out my eyes?\"")
+          trust_increase_large (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_small (Chrys)
           }
-          otherwise {
-            already_talked (this)
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_small (Steve)
           }
-        </item>
-        <item key="family parents">
-          firsttime {
-            msg ("\"Truly, our families are our bedrocks. Without them, we would not be where we are today\"")
-            trust_increase_medium (this)
-            if (ListContains(ScopeVisible(), Chrys)) {
-              trust_decrease_medium (Chrys)
-            }
-            if (ListContains(ScopeVisible(), Steve)) {
-              trust_increase_medium (Steve)
-            }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </gems>
+      <herfamily type="script">
+        firsttime {
+          msg ("\"Truly, our families are our bedrocks. Without them, we would not be where we are today\"")
+          trust_increase_medium (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_medium (Chrys)
           }
-          otherwise {
-            already_talked (this)
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_medium (Steve)
           }
-        </item>
-      </ask>
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </herfamily>
+      <yourfinances type="script">
+        tell_finance_topic (this)
+      </yourfinances>
+      <makeyourfundingpitch type="script">
+        funding_pitch (this)
+      </makeyourfundingpitch>
+      <yourfamily type="script">
+        firsttime {
+          msg ("\"While they did not have much, maybe they had love for you?\"")
+          trust_increase_small (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_medium (Chrys)
+          }
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_medium (Steve)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </yourfamily>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
       <alias>Beautiful Portrait Painting</alias>
       <usestandardverblist />
-      <takemsg>You try to pull it off the wall but it disappears, revealing something.</takemsg>
+      <takemsg>You try to pull it off the wall. It seems like there was something behind it</takemsg>
       <take />
       <ontake type="script">
-        MakeObjectInvisible (portrait)
         picture ("VaseDetail2.png")
+        portrait.parent = Gallery
+        msg ("It disappears from your hands and reappears on the wall")
       </ontake>
     </object>
     <object name="landscape">
       <inherit name="editor_object" />
       <alias>Beautiful Landscape Painting</alias>
       <take />
-      <takemsg>You try to take it off the wall but it disappears, revealing something</takemsg>
+      <takemsg>You try to pull it off the wall. It seems like there was something behind it</takemsg>
       <usestandardverblist />
+      <attr name="not_all" type="boolean">false</attr>
       <ontake type="script">
-        MakeObjectInvisible (landscape)
-        picture ("intro_detail.png")
+        picture ("intro_detail2.png")
+        landscape.parent = Gallery
+        msg ("It disappears from your hands and reappears on the wall")
       </ontake>
     </object>
     <object name="abstract">
@@ -273,11 +268,15 @@
       <alias>Beautiful Abstract Painting</alias>
       <attr name="feature_switchable" type="boolean">false</attr>
       <take />
-      <takemsg>You try to pull it off the wall but it disappears, revealing something.</takemsg>
+      <takemsg>You try to pull it off the wall. It seems like there was something behind it</takemsg>
       <usestandardverblist />
       <ontake type="script">
-        MakeObjectInvisible (abstract)
+        picture ("pager_detail.png")
+        abstract.parent = Gallery
+        msg ("It disappears from your hands and reappears on the wall")
       </ontake>
+      <lift type="script">
+      </lift>
     </object>
   </object>
   <object name="Patio">
@@ -328,10 +327,12 @@
         if (GetOuter("hand") <> null) {
           msg ("You punch through Chrys. He turns into a pile of miniature pagers and clatters to the floor")
           list remove (game.myTrueFunderList, Chrys)
+          MakeObjectInvisible (Chrys)
+          ImageOrderLogic
         }
         else {
           msg ("You put your dukes up and wind up for a big punch.")
-          PrintCentered ("I'm pretty sure you don't want to do that.")
+          PrintCentered ("Googface: I'm pretty sure you don't want to do that.")
           msg ("You put your hands back down.")
         }
       ]]></punch>
@@ -346,80 +347,81 @@
       </thank>
       <introduceyourselfto type="script">
         firsttime {
-          msg ("Whatever")
-          trust_decrease_small
+          msg ("Whatever. You're taking up my time I could be spending on my company.")
+          trust_decrease_small (this)
         }
       </introduceyourselfto>
       <ask type="scriptdictionary">
-        <item key="company">
-          firsttime {
-            msg ("\"I've got this great startup, and what we do is get game atheletes these shirts that flash a different ad every 8 seconds.")
-            trust_increase_large (this)
-            if (ListContains(ScopeVisible(), Steve)) {
-              trust_decrease_small (Steve)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_decrease_large (Amand)
-            }
-          }
-          otherwise {
-            already_talked (this)
-          }
-        </item>
-        <item key="investment investments">
-          firsttime {
-            msg ("\"I think this real estate investment is stupid. My dad says I have to DIVERSIFY my investments even if I make LESS money. DIVERSIFY? More like DiversiDUMB!\"")
-            trust_decrease_medium (this)
-            if (ListContains(ScopeVisible(), Steve)) {
-              trust_increase_small (Steve)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_increase_medium (Amand)
-            }
-          }
-          otherwise {
-            already_talked (this)
-          }
-        </item>
-        <item key="phone">
-          firsttime {
-            msg ("\"Yeah, my phone IS the latest model. It's not out yet, but I know a guy\"")
-            trust_increase_large (this)
-            if (ListContains(ScopeVisible(), Steve)) {
-              trust_decrease_small (Steve)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_decrease_medium (Amand)
-            }
-          }
-          otherwise {
-            already_talked (this)
-          }
-        </item>
         <item key="watch">
-          firsttime {
-            msg ("\"My watch doesn't show the time, it uses vibrations to continually send the current time to my brain.\"")
-            trust_increase_large (this)
-            if (ListContains(ScopeVisible(), Steve)) {
-              trust_increase_small (Steve)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_decrease_medium (Amand)
-            }
-          }
-          otherwise {
-            already_talked (this)
-          }
         </item>
       </ask>
-      <tell type="scriptdictionary">
-        <item key="your finances">
-          tell_finance_topic (this)
-        </item>
-        <item key="your pitch">
-          funding_pitch (this)
-        </item>
-      </tell>
+      <tell type="scriptdictionary" />
+      <hiscompany type="script">
+        firsttime {
+          msg ("\"I've got this great startup, and what we do is get game atheletes these shirts that flash a different ad every 8 seconds.")
+          trust_increase_large (this)
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_decrease_small (Steve)
+          }
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_decrease_large (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </hiscompany>
+      <hisinvestments type="script">
+        firsttime {
+          msg ("\"I think this real estate investment is stupid. My dad says I have to DIVERSIFY my investments even if I make LESS money. DIVERSIFY? More like DiversiDUMB!\"")
+          trust_decrease_medium (this)
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_small (Steve)
+          }
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_increase_medium (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </hisinvestments>
+      <hiswatch type="script">
+        firsttime {
+          msg ("\"My watch doesn't show the time, it uses vibrations to continually send the current time to my brain.\"")
+          trust_increase_large (this)
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_increase_small (Steve)
+          }
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_decrease_medium (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </hiswatch>
+      <hisphone type="script">
+        firsttime {
+          msg ("\"Yeah, my phone IS the latest model. It's not out yet, but I know a guy\"")
+          trust_increase_large (this)
+          if (ListContains(ScopeVisible(), Steve)) {
+            trust_decrease_small (Steve)
+          }
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_decrease_medium (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </hisphone>
+      <yourfinances type="script">
+        tell_finance_topic (this)
+      </yourfinances>
+      <makeyourfundingpitch type="script">
+        funding_pitch (this)
+      </makeyourfundingpitch>
     </object>
     <object name="Steve">
       <inherit name="editor_object" />
@@ -453,10 +455,12 @@
         if (GetOuter("hand") <> null) {
           msg ("You punch through Steve. He turns into a pile of miniature submarines and scatters to the floor")
           list remove (game.myTrueFunderList, Steve)
+          MakeObjectInvisible (Steve)
+          ImageOrderLogic
         }
         else {
           msg ("You put your dukes up and wind up for a big punch.")
-          PrintCentered ("I'm pretty sure you don't want to do that.")
+          PrintCentered ("Googface: I'm pretty sure you don't want to do that.")
           msg ("You put your hands back down.")
         }
       ]]></punch>
@@ -466,104 +470,93 @@
           trust_increase_small
         }
       </introduceyourselfto>
-      <saygoodbyeto type="script">
-        msg ("\"Anchors, cast off!\"")
-        set (fundee, "currently_talking_to", null)
-      </saygoodbyeto>
+      <hisfather type="script">
+        firsttime {
+          msg ("\"Ah yes, my father was a great man. He sailed the seas in a fleet of 32 ships, doing good all over the world. I can only hope to be like him.")
+          trust_increase_large (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_medium (Chrys)
+          }
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_increase_small (Amand)
+          }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </hisfather>
       <speak type="script">
         msg ("\"Ahoy!\"")
         set (fundee, "currently_talking_to", fundee)
       </speak>
-      <ask type="scriptdictionary">
-        <item key="ship boat">
-          firsttime {
-            msg ("\"Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with the high sees and crashed it. My father was graciously forgiving about that.\"")
-            trust_increase_large (this)
-            if (ListContains(ScopeVisible(), Chrys)) {
-              trust_decrease_small (Chrys)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_increase_medium (Amand)
-            }
+      <ask type="scriptdictionary" />
+      <tell type="scriptdictionary" />
+      <hisboat type="script">
+        firsttime {
+          msg ("\"Thank you for asking me about that. I do love my ship. I first sailed the seas on one of my father's schooners when I was 12. Of course, I never figured out how to deal with the high sees and crashed it. My father was graciously forgiving about that.\"")
+          trust_increase_large (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_small (Chrys)
           }
-          otherwise {
-            already_talked (this)
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_increase_medium (Amand)
           }
-        </item>
-        <item key="parents; father">
-          firsttime {
-            msg ("\"Ah yes, my father was a great man. He sailed the seas in a fleet of 32 ships, doing good all over the world. I can only hope to be like him.")
-            trust_increase_large (this)
-            if (ListContains(ScopeVisible(), Chrys)) {
-              trust_decrease_medium (Chrys)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_increase_small (Amand)
-            }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </hisboat>
+      <realestate type="script">
+        firsttime {
+          msg ("\"What a worthless thing to talk about.\"")
+          trust_decrease_medium (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_small (Chrys)
           }
-          otherwise {
-            already_talked (this)
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_increase_medium (Amand)
           }
-        </item>
-        <item key="land; house; real estate">
-          firsttime {
-            msg ("\"What a worthless thing to talk about.\"")
-            trust_decrease_medium (this)
-            if (ListContains(ScopeVisible(), Chrys)) {
-              trust_decrease_small (Chrys)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_increase_medium (Amand)
-            }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </realestate>
+      <oceans type="script">
+        firsttime {
+          msg ("\"Ah, the Atlantic and the Pacific. Both of those seas are dangerous, but in different ways. the Atlantic, through the fierce storms, and the Pacific, through the immense size. You must treat each like an unruly subling, and learn how to anticipate their moves\"")
+          trust_increase_large (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_increase_small (Chrys)
           }
-          otherwise {
-            already_talked (this)
+          if (ListContains(ScopeVisible(), Amand)) {
+            trust_decrease_small (Amand)
           }
-        </item>
-        <item key="atlantic pacific">
-          firsttime {
-            msg ("\"Ah, the Atlantic and the Pacific. Both of those seas are dangerous, but in different ways. the Atlantic, through the fierce storms, and the Pacific, through the immense size. You must treat each like an unruly subling, and learn how to anticipate their moves\"")
-            trust_increase_large (this)
-            if (ListContains(ScopeVisible(), Chrys)) {
-              trust_increase_small (Chrys)
-            }
-            if (ListContains(ScopeVisible(), Amand)) {
-              trust_decrease_small (Amand)
-            }
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </oceans>
+      <yourfinances type="script">
+        tell_finance_topic (this)
+      </yourfinances>
+      <yourfamily type="script">
+        firsttime {
+          msg ("\"So your parents left you nothing? How disgraceful. I suppose it's not ENTIRELY your fault\"")
+          trust_decrease_small (this)
+          if (ListContains(ScopeVisible(), Chrys)) {
+            trust_decrease_medium (Chrys)
           }
-          otherwise {
-            already_talked (this)
+          else if (ListContains(ScopeVisible(), Amand)) {
+            trust_increase_medium (Amand)
           }
-        </item>
-      </ask>
-      <tell type="scriptdictionary">
-        <item key="your family">
-          if (fundee.currently_talking_to = this) {
-            firsttime {
-              msg ("\"So your parents left you nothing? How disgraceful. I suppose it's not ENTIRELY your fault\"")
-              trust_decrease_small (this)
-              if (ListContains(ScopeVisible(), Chrys)) {
-                trust_decrease_medium (Chrys)
-              }
-              else if (ListContains(ScopeVisible(), Amand)) {
-                trust_increase_medium (Amand)
-              }
-            }
-            otherwise {
-              already_talked (this)
-            }
-          }
-          else {
-            PrintCentered ("You need to introduce yourself first.")
-          }
-        </item>
-        <item key="your finances">
-          tell_finance_topic (this)
-        </item>
-        <item key="your pitch;">
-          funding_pitch (this)
-        </item>
-      </tell>
+        }
+        otherwise {
+          already_talked (this)
+        }
+      </yourfamily>
+      <makeyourfundingpitch type="script">
+        funding_pitch (this)
+      </makeyourfundingpitch>
     </object>
   </object>
   <turnscript name="CheckForAmount">
@@ -716,6 +709,30 @@
         }
       ]]></script>
     </turnscript>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
+    </object>
   </object>
   <object name="queen_void">
     <inherit name="editor_room" />
@@ -804,6 +821,79 @@
     <property>where</property>
     <pattern>where</pattern>
     <defaultexpression>"You can't where " + object.article + "."</defaultexpression>
+  </verb>
+  <object name="NoRoom">
+    <inherit name="editor_room" />
+  </object>
+  <verb>
+    <property>gems</property>
+    <pattern>gems; jewelry</pattern>
+    <defaultexpression>"You can't gems; jewelry " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>herfamily</property>
+    <pattern>her family;</pattern>
+    <defaultexpression>"You can't her family; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>boat</property>
+    <pattern>boat</pattern>
+    <defaultexpression>"You can't boat " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>hisboat</property>
+    <pattern>his boat;</pattern>
+    <defaultexpression>"You can't his boat; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>hisfather</property>
+    <pattern>his father;</pattern>
+    <defaultexpression>"You can't his father; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>realestate</property>
+    <pattern>real estate;</pattern>
+    <defaultexpression>"You can't real estate; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>oceans</property>
+    <pattern>oceans</pattern>
+    <defaultexpression>"You can't oceans " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>yourfinances</property>
+    <pattern>your finances;</pattern>
+    <defaultexpression>"You can't your finances; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>yourfamily</property>
+    <pattern>your family</pattern>
+    <defaultexpression>"You can't your family " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>makeyourfundingpitch</property>
+    <pattern>make your funding pitch;</pattern>
+    <defaultexpression>"You can't make your funding pitch; " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>hiscompany</property>
+    <pattern>his company</pattern>
+    <defaultexpression>"You can't his company " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>hisinvestments</property>
+    <pattern>his investments</pattern>
+    <defaultexpression>"You can't his investments " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>hisphone</property>
+    <pattern>his phone</pattern>
+    <defaultexpression>"You can't his phone " + object.article + "."</defaultexpression>
+  </verb>
+  <verb>
+    <property>hiswatch</property>
+    <pattern>his watch</pattern>
+    <defaultexpression>"You can't his watch " + object.article + "."</defaultexpression>
   </verb>
   <function name="tell_finance_topic" parameters="funder">
     set (fundee, "currently_talking_to", funder)
@@ -994,6 +1084,7 @@
   <function name="change_room" parameters="funder, room"><![CDATA[
     if (game.pov.parent = funder.parent) {
       msg (funder.alias + " leaves the room.")
+      MoveObject (funder, room)
       ImageOrderLogic
     }
     if (fundee.currently_talking_to <> funder) {
@@ -1050,30 +1141,12 @@
     msg (funder.alias + " looks like " + funder.gender + " trusts you a lot less.")
     funder.trust = funder.trust - 15
   </function>
-  <function name="game_exit"><![CDATA[
-    msg ("You take off the VR headset. You're out. A message comes in on your text pager device. It's a message from The Queen")
+  <function name="game_exit">
+    MakeObjectInvisible (vr_headset)
+    msg ("You take off the VR headset. You're out. Now what?")
     MoveObject (fundee, apartment)
-    if (fundee.funds > fundee.funds_needed - 1) {
-      msg ("Congratulations, you raised a total of $" + fundee.funds + "! It looks like you be able to own your own home after 60 years!")
-      foreach (funder, game.myTrueFunderList) {
-        if (funder.thanked = true) {
-          IncreaseObjectCounter (fundee, "funders")
-        }
-      }
-      msg ("You will be paying to the following [" + fundee.funders + "] funders.")
-      foreach (funder, game.myTrueFunderList) {
-        if (funder.thanked = true) {
-          msg ("Funder: " + funder.alias)
-        }
-      }
-      msg ("\"Your children after you will speak of you in their stories and legends. Prepare for your first step out of commonality and into greatness\"")
-      finish
-    }
-    else {
-      msg ("Although you did not raise enough money to finance your mortgage, do not feel ashamed. Only 5% of total participants raise enough funds. For the rest of your life, you are still expected to remain productive while we take 95% of your input for rent. Enjoy the rest of your life.")
-      finish
-    }
-  ]]></function>
+    EnableTimer (pager_buzz2)
+  </function>
   <function name="show_correct_image">
   </function>
   <function name="change_picture_frame" parameters="front_char, back_char, room"><![CDATA[
@@ -1126,6 +1199,29 @@
   <function name="first_check">
     PrintCentered (fundee.worker_id.value + ", I am glad you decided you are up for this challenge. This is not something to be taken lightly")
   </function>
+  <function name="final_check"><![CDATA[
+    if (fundee.funds > fundee.funds_needed - 1) {
+      msg ("Congratulations, you raised a total of $" + fundee.funds + "! It looks like you be able to own your own home after 60 years!")
+      foreach (funder, game.myTrueFunderList) {
+        if (funder.thanked = true) {
+          IncreaseObjectCounter (fundee, "funders")
+        }
+      }
+      msg ("You will be paying to the following [" + fundee.funders + "] funders.")
+      foreach (funder, game.myTrueFunderList) {
+        if (funder.thanked = true) {
+          msg ("Funder: " + funder.alias)
+        }
+      }
+      msg ("\"Your children after you will speak of you in their stories and legends. Prepare for your first step out of commonality and into greatness\"")
+      finish
+    }
+    else {
+      msg ("Although you did not raise enough money to finance your mortgage, do not feel ashamed. Only 5% of total participants raise enough funds. For the rest of your life, you are still expected to remain productive while we take 95% of your input for rent. Enjoy the rest of your life.")
+      finish
+    }
+    DisableTimer (pager_buzz2)
+  ]]></function>
   <walkthrough name="testing">
     <steps type="simplestringlist">
       grasb Vase
@@ -1317,6 +1413,12 @@
   <timer name="pager_buzz">
     <interval>10</interval>
     <enabled type="boolean">false</enabled>
+    <script>
+      msg ("Your pager buzzes. You should check it.")
+    </script>
+  </timer>
+  <timer name="pager_buzz2">
+    <interval>10</interval>
     <script>
       msg ("Your pager buzzes. You should check it.")
     </script>
