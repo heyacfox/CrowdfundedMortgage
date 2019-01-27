@@ -18,7 +18,7 @@
     <attr name="funds_needed" type="int">100000</attr>
     <attr name="funds_raised" type="boolean">false</attr>
     <attr name="time_cycle_count" type="int">10</attr>
-    <category>Surreal</category>
+    <category>Sci-Fi</category>
     <enablehyperlinks />
     <turnoffplacesandobjects />
     <setcustompadding />
@@ -58,6 +58,10 @@
     <gridmap type="boolean">false</gridmap>
     <menufontsize type="int">14</menufontsize>
     <customstatuspane />
+    <cover>10minutemorgagetitle.png</cover>
+    <description><![CDATA[This is a dystopian techno-capitalist future novel where you have to get a mortgage directly from investors because there are no financial intermediaries.<br/><br/>]]></description>
+    <author>Nathaniel Hahn, Tyler Samson, Bon Beau, and Agave</author>
+    <subtitle>Trial of the Googface</subtitle>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
