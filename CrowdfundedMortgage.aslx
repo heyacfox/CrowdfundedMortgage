@@ -38,7 +38,7 @@
     <command_newline />
     <SUPERDEBUG type="boolean">false</SUPERDEBUG>
     <attr name="worker_id">ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad</attr>
-    <turnoffcompass />
+    <turnoffcompass type="boolean">false</turnoffcompass>
     <pov type="object">fundee</pov>
     <attr name="temp_front" type="object">NoOne</attr>
     <attr name="temp_back" type="object">NoOne</attr>
@@ -55,6 +55,7 @@
     </start>
     <roomenter type="script">
     </roomenter>
+    <gridmap type="boolean">false</gridmap>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -71,7 +72,7 @@
     <enter type="script">
       ImageOrderLogic
     </enter>
-    <exit name="Exit to Patio" alias="through the door to the patio" to="Patio">
+    <exit name="Exit to Patio" alias="north" to="Patio">
       <inherit name="northdirection" />
     </exit>
     <object name="NoOne">
@@ -123,7 +124,7 @@
         <value>glove</value>
       </alt>
     </object>
-    <exit alias="up the stairs to the gallery" to="Gallery">
+    <exit alias="up" to="Gallery">
       <inherit name="updirection" />
     </exit>
     <object name="fundee">
@@ -350,7 +351,7 @@
       <lift type="script">
       </lift>
     </object>
-    <exit alias="down the stairs to the hall" to="Central Hall">
+    <exit alias="down" to="Central Hall">
       <inherit name="downdirection" />
     </exit>
   </object>
@@ -365,14 +366,15 @@
     <enter type="script">
       ImageOrderLogic
     </enter>
-    <exit alias="back through the door to the hall" to="Central Hall">
-      <inherit name="eastdirection" />
+    <exit alias="south" to="Central Hall">
+      <inherit name="southdirection" />
     </exit>
-    <exit name="debug_path" alias="through the ocean" to="Debug">
-      <inherit name="westdirection" />
+    <exit name="debug_path" alias="north" to="Debug">
+      <inherit name="northdirection" />
       <locked type="boolean">false</locked>
       <visible type="boolean">false</visible>
       <lockmessage type="string"></lockmessage>
+      <message>You walk through the broken ocean.</message>
     </exit>
     <object name="ocean">
       <inherit name="editor_object" />
@@ -739,8 +741,8 @@
     <inherit name="editor_room" />
     <descprefix type="string"></descprefix>
     <description>NOTE: IF YOU ARE HERE THEN THIS IS A DEV BUILD. GREP HAS THE LIST OF DEBUG COMMANDS YOU CAN USE WHILE YOU ARE IN HERE.</description>
-    <exit alias="through the ocean to the patio" to="Patio">
-      <inherit name="eastdirection" />
+    <exit alias="south" to="Patio">
+      <inherit name="southdirection" />
       <locked type="boolean">false</locked>
       <lockmessage type="string"></lockmessage>
       <visible />
