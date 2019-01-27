@@ -37,6 +37,7 @@
     <autodescription_description_newline />
     <command_newline />
     <SUPERDEBUG type="boolean">false</SUPERDEBUG>
+    <attr name="worker_id">ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad</attr>
     <pov type="object">fundee</pov>
     <attr name="temp_front" type="object">NoOne</attr>
     <attr name="temp_back" type="object">NoOne</attr>
@@ -53,7 +54,6 @@
     </start>
     <roomenter type="script">
     </roomenter>
-    <attr name="worker_id">ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad</attr>
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -116,6 +116,30 @@
       <takemsg>You are given the Fist of Vengeance</takemsg>
       <drop type="boolean">false</drop>
       <look>This is obviously a glove that you can wear, but it has no weight. It looks like the graphics are missing.</look>
+    </object>
+    <object name="fundee">
+      <inherit name="editor_object" />
+      <inherit name="editor_player" />
+      <attr name="funds_needed" type="int">100000</attr>
+      <leave type="string"></leave>
+      <finance_topics type="stringlist">
+        <value>how much money your parents have</value>
+        <value>how frugal you are with your spending</value>
+        <value>how you make your credit payments early every month</value>
+      </finance_topics>
+      <funds type="int">0</funds>
+      <alias>fundee</alias>
+      <statusattributes type="stringdictionary">
+        <item>
+          <key>funds</key>
+          <value></value>
+        </item>
+        <item>
+          <key>funds_needed</key>
+          <value></value>
+        </item>
+      </statusattributes>
+      <attr name="currently_talking_to" type="object">NoOne</attr>
     </object>
   </object>
   <object name="Gallery">
@@ -685,12 +709,12 @@
       </check>
     </object>
     <turnscript name="wearing_headset">
+      <enabled />
       <script><![CDATA[
         if (GetOuter("head") <> null) {
           MoveObject (fundee, queen_void)
         }
       ]]></script>
-      <enabled />
     </turnscript>
   </object>
   <object name="queen_void">
@@ -706,63 +730,37 @@
       <possessive>theirs</possessive>
       <intro_questions type="stringlist">
         <value>Why am I here</value>
-        <value>How does this work</value>
         <value>What should I ask the funders</value>
-        <value>Where will I meet the funders</value>
         <value>Who will my funders be</value>
         <value>I am ready now</value>
         <value>How much time will I have</value>
       </intro_questions>
       <attr name="finished_talking" type="boolean">false</attr>
+      <look>The Googface is everywhere and know where.</look>
       <speak type="script">
-        PrintCentered ("Hello productive member of society")
+        msg ("Googface: Hello productive member of society")
         firsttime {
           first_check
           PrintCentered ("-------------------------------")
           PrintCentered ("-------------------------------")
-          PrintCentered ( "WORKAROUND: ENTER WORKER ID")
+          PrintCentered ("WORKAROUND: ENTER WORKER ID")
           get input {
             set (fundee, "worker_id", result)
-            PrintCentered ("Thank you, please wait a moment while I connect to the Googface master server to verify your information.")
             SetTimeout (2) {
               queen_questions
             }
+            msg ("Googface: Thank you, please wait a moment while I connect to the Googface master server to verify your information.")
           }
           EnableTurnScript (id_check)
         }
         otherwise {
         }
       </speak>
-      <look>The Googface is everywhere and know where.</look>
     </object>
     <exit name="void_exit" alias="out" to="Central Hall">
       <inherit name="outdirection" />
       <visible type="boolean">false</visible>
     </exit>
-    <object name="fundee">
-      <inherit name="editor_object" />
-      <inherit name="editor_player" />
-      <attr name="funds_needed" type="int">100000</attr>
-      <leave type="string"></leave>
-      <finance_topics type="stringlist">
-        <value>how much money your parents have</value>
-        <value>how frugal you are with your spending</value>
-        <value>how you make your credit payments early every month</value>
-      </finance_topics>
-      <funds type="int">0</funds>
-      <alias>fundee</alias>
-      <statusattributes type="stringdictionary">
-        <item>
-          <key>funds</key>
-          <value></value>
-        </item>
-        <item>
-          <key>funds_needed</key>
-          <value></value>
-        </item>
-      </statusattributes>
-      <attr name="currently_talking_to" type="object">NoOne</attr>
-    </object>
   </object>
   <turnscript name="id_check">
     <enabled type="boolean">false</enabled>
@@ -931,34 +929,33 @@
   ]]></function>
   <function name="queen_questions">
     firsttime {
-      PrintCentered ("I am here to answer any of  your questions. Googface has infinite processing time to spend with you to prepare you for this event.")
+      msg ("Googface: I am here to answer any of  your questions. Googface has infinite processing time to spend with you to prepare you for this event.")
       queen_questions
     }
     otherwise {
       ShowMenu ("What do you want to know about?", queen_intro.intro_questions, false) {
         switch (result) {
           case ("Why am I here") {
-            PrintCentered ("You will have the opportunity to audition before 3 prestigious individuals who will determine your worthiness as an investment opportunity. You must convince them to allow you the opportunity to be exploited for 60 years in exchange for a home mortgage. This is a great privilege, you should be honored.")
+            msg ("Googface: You will have the opportunity to audition before 3 prestigious individuals who will determine your worthiness as an investment opportunity. You must convince them to allow you the opportunity to be exploited for 60 years in exchange for a home mortgage. This is a great privilege, you should be honored.")
+            msg ("")
           }
           case ("What should I ask the funders") {
-            PrintCentered ("You should tell them about yourself, and ask them about their selection criteria. Make them feel confident about their decision.")
-          }
-          case ("How does this work") {
-            PrintCentered ("(remove this)")
-          }
-          case ("Where will I meet the funders") {
-            PrintCentered ("(remove)")
-          }
-          case ("Who will my funders be") {
-            PrintCentered ("First, the Admiral (Stevenerico Mostarpularious), weighed down with medals signifying all his great accomplishments.")
-            PrintCentered ("Next, the Genius (Chrysteravegnar Poppylivoginowrbt), the greatest tech guru of our times.")
-            PrintCentered ("Lastly, the Socialite (Amanderye Wischopillorhoffman), who is extremely well-connected.")
+            msg ("Googface: You should tell them about yourself, and ask them about their selection criteria. Make them feel confident about their decision.")
+            msg ("")
           }
           case ("I am ready now") {
             MoveObject (fundee, Central Hall)
+            DisableTurnScript (id_check)
+          }
+          case ("Who will my funders be") {
+            msg ("Googface: First, the Admiral (Stevenerico Mostarpularious), weighed down with medals signifying all his great accomplishments.")
+            msg ("Googface: Next, the Genius (Chrysteravegnar Poppylivoginowrbt), the greatest tech guru of our times.")
+            msg ("Googface: Lastly, the Socialite (Amanderye Wischopillorhoffman), who is extremely well-connected.")
+            msg ("")
           }
           case ("How much time will I have") {
-            PrintCentered ("You will have exactly " + game.time_cycle_count_start + " minutes to convince these demanding investors to provide the capital for your mortgage. I will remind you every minute that passes. You will only get one chance to pitch to them")
+            msg ("Googface: You will have exactly " + game.time_cycle_count_start + " minutes to convince these demanding investors to provide the capital for your mortgage. I will remind you every minute that passes. You will only get one chance to pitch to them")
+            msg ("")
           }
         }
       }
@@ -1080,9 +1077,9 @@
   <function name="show_correct_image">
   </function>
   <function name="change_picture_frame" parameters="front_char, back_char, room"><![CDATA[
-    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:300px;'/>")
-    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:300px;'/></div>")
-    msg ("<div style='position:absolute; left: 0px; top: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:300px;'/>")
+    msg ("<div style='position:absolute; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(room.real_image) + "' style='position:absolute;width:300px;'/>")
+    msg ("<div style='position:absolute; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(back_char.image_rear) + "' style='position:absolute;width:300px;'/></div>")
+    msg ("<div style='position:absolute; left: 0px; bottom: 20px; width: 300px; height: 300px;'><img src='" + GetFileURL(front_char.image_front) + "' style='position:absolute;width:300px;'/>")
   ]]></function>
   <function name="ImageOrderLogic">
     game.temp_front = NoOne
@@ -1277,6 +1274,15 @@
       go west
       go west
       thank Chrys
+    </steps>
+  </walkthrough>
+  <walkthrough name="get_to_game">
+    <steps type="simplestringlist">
+      check pager
+      wear headset
+      talk to Googface
+      1563
+      event:ShowMenuResponse;I am ready now
     </steps>
   </walkthrough>
   <timer name="time_cycle">
