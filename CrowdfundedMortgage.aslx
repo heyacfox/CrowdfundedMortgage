@@ -689,6 +689,7 @@
       </wear_slots>
       <wear_adjverbs />
       <where>Seriously? It's right in front of you.</where>
+      <drop type="boolean">false</drop>
     </object>
     <object name="pager">
       <inherit name="editor_object" />
@@ -705,6 +706,7 @@
       <enabled />
       <script><![CDATA[
         if (GetOuter("head") <> null) {
+          DisableTurnScript (wearing_headset)
           MoveObject (fundee, queen_void)
         }
       ]]></script>
@@ -749,8 +751,8 @@
         <value>Why am I here</value>
         <value>What should I ask the funders</value>
         <value>Who will my funders be</value>
-        <value>I am ready now</value>
         <value>How much time will I have</value>
+        <value>I am ready now</value>
       </intro_questions>
       <attr name="finished_talking" type="boolean">false</attr>
       <look>The Googface is everywhere and know where.</look>
@@ -1074,7 +1076,7 @@
       }
       else {
         msg ("Ugh, " + funder.gender + " grumbles. You're insufferable, you know that?")
-        funder.gave_fund = true
+        funder.gave_fund = false
       }
     }
     else {
