@@ -38,6 +38,7 @@
     <command_newline />
     <SUPERDEBUG type="boolean">false</SUPERDEBUG>
     <attr name="worker_id">ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad</attr>
+    <turnoffcompass />
     <pov type="object">fundee</pov>
     <attr name="temp_front" type="object">NoOne</attr>
     <attr name="temp_back" type="object">NoOne</attr>
@@ -54,7 +55,6 @@
     </start>
     <roomenter type="script">
     </roomenter>
-    <turnoffcompass />
   </game>
   <object name="Central Hall">
     <inherit name="editor_room" />
@@ -87,6 +87,7 @@
       <usestandardverblist />
       <take />
       <takemsg>You try to take the vase</takemsg>
+      <look>You had better not pick this up. If you break it, all your future generations will be paying for your debt.</look>
       <grasb type="script"><![CDATA[
         MakeObjectVisible (Fist)
         AddToInventory (Fist)
@@ -101,7 +102,6 @@
         msg ("The vase is very heavy, so you set it back down.")
         Vase.parent = Central Hall
       </ontake>
-      <look>You had better not pick this up. If you break it, all your future generations will be paying for your debt.</look>
     </object>
     <object name="Fist">
       <inherit name="editor_object" />
@@ -157,10 +157,10 @@
     <prefix>the</prefix>
     <picture type="string"></picture>
     <attr name="real_image">gallery.png</attr>
+    <description>Beautiful paintings surround you.</description>
     <enter type="script">
       ImageOrderLogic
     </enter>
-    <description>Beautiful paintings surround you.</description>
     <object name="Amand">
       <inherit name="editor_object" />
       <inherit name="namedfemale" />
@@ -171,6 +171,8 @@
       <thanked type="boolean">false</thanked>
       <attr name="image_front">Amand_front.png</attr>
       <attr name="image_rear">Amand_rear.png</attr>
+      <look>Socialite Amanderye Wischopillorhoffman practically glows with the light bouncing off her jewels.</look>
+      <speak>"Isn't this place gorgeous?"</speak>
       <punch type="script"><![CDATA[
         if (GetOuter("hand") <> null) {
           msg ("You punch through Amand. She turns into a pile of miniature feather boas and drifts to the floor")
@@ -259,8 +261,6 @@
         </item>
       </tell>
       <ask type="scriptdictionary" />
-      <look>Socialite Amanderye Wischopillorhoffman practically glows with the light bouncing off her jewels.</look>
-      <speak>"Isn't this place gorgeous?"</speak>
     </object>
     <object name="portrait">
       <inherit name="editor_object" />
@@ -268,12 +268,12 @@
       <usestandardverblist />
       <takemsg>You try to pull it off the wall. It seems like there was something behind it</takemsg>
       <take />
+      <look>For some reason, the person in the portrait looks familiar. </look>
       <ontake type="script">
         picture ("VaseDetail2.png")
         portrait.parent = Gallery
         msg ("It disappears from your hands and reappears on the wall")
       </ontake>
-      <look>For some reason, the person in the portrait looks familiar. </look>
     </object>
     <object name="landscape">
       <inherit name="editor_object" />
@@ -282,12 +282,12 @@
       <takemsg>You try to pull it off the wall. It seems like there was something behind it</takemsg>
       <usestandardverblist />
       <attr name="not_all" type="boolean">false</attr>
+      <look>This is too beautiful, you would never see this in real life.</look>
       <ontake type="script">
         picture ("intro_detail2.png")
         landscape.parent = Gallery
         msg ("It disappears from your hands and reappears on the wall")
       </ontake>
-      <look>This is too beautiful, you would never see this in real life.</look>
     </object>
     <object name="abstract">
       <inherit name="editor_object" />
@@ -296,6 +296,7 @@
       <take />
       <takemsg>You try to pull it off the wall. It seems like there was something behind it</takemsg>
       <usestandardverblist />
+      <look><![CDATA[You tilt your head sideways. Maybe it's a Jackson Pollock?<br/><br/>"Hm."]]></look>
       <ontake type="script">
         picture ("ocean_detail.png")
         abstract.parent = Gallery
@@ -303,7 +304,6 @@
       </ontake>
       <lift type="script">
       </lift>
-      <look><![CDATA[You tilt your head sideways. Maybe it's a Jackson Pollock?<br/><br/>"Hm."]]></look>
     </object>
     <exit alias="down the stairs to the hall" to="Central Hall">
       <inherit name="downdirection" />
@@ -354,6 +354,7 @@
       <thanked type="boolean">false</thanked>
       <attr name="image_front">Chrys_front.png</attr>
       <attr name="image_rear">Chrys_rear.png</attr>
+      <speak>"I'm too cool to be here."</speak>
       <punch type="script"><![CDATA[
         if (GetOuter("hand") <> null) {
           msg ("You punch through Chrys. He turns into a pile of miniature pagers and clatters to the floor")
@@ -453,7 +454,6 @@
         </item>
       </ask>
       <tell type="scriptdictionary" />
-      <speak>"I'm too cool to be here."</speak>
     </object>
     <object name="Steve">
       <inherit name="editor_object" />
@@ -585,8 +585,6 @@
       <makeyourfundingpitch type="script">
         funding_pitch (this)
       </makeyourfundingpitch>
-      <ask type="scriptdictionary" />
-      <tell type="scriptdictionary" />
       <favoritecocktail type="script">
         firsttime {
           msg ("\"Of course it has to be rum. Isn't it obvious from the color of my face? No sailor would be caught with a fruity beverage on the high seas.\"")
@@ -599,6 +597,8 @@
           already_talked (this)
         }
       </favoritecocktail>
+      <ask type="scriptdictionary" />
+      <tell type="scriptdictionary" />
     </object>
   </object>
   <turnscript name="CheckForAmount">
@@ -674,6 +674,9 @@
       <gender>they</gender>
       <article>them</article>
       <possessive>theirs</possessive>
+      <displayverbs type="stringlist">
+        <value>Look at</value>
+      </displayverbs>
       <askaboutlove type="script">
         foreach (funder, game.myTrueFunderList) {
           funder.trust = 100
@@ -691,9 +694,6 @@
         fundee.funds = fundee.funds_needed
       </askaboutbeingrich>
       <ask type="scriptdictionary" />
-      <displayverbs type="stringlist">
-        <value>Look at</value>
-      </displayverbs>
     </object>
   </object>
   <verb>
@@ -740,6 +740,8 @@
     </object>
     <object name="pager">
       <inherit name="editor_object" />
+      <look>You have 854 messages unread. Most of them are targeted ads based on your Googface data profile.</look>
+      <alias>pager</alias>
       <check type="script"><![CDATA[
         msg ("Every person has a specific worker ID, but something went wrong with yours so you had to get a new pager. At least this one doesn't have googstains on it.")
         msg ("A message appears on the pager.")
@@ -756,8 +758,6 @@
           msg ("You don't feel like reading your spam messages now.;")
         }
       ]]></check>
-      <look>You have 854 messages unread. Most of them are targeted ads based on your Googface data profile.</look>
-      <alias>pager</alias>
     </object>
     <turnscript name="wearing_headset">
       <enabled />
@@ -1138,6 +1138,7 @@
             msg ("Feeling like you gained his trust, you strike your best Captain Morgan stance and stare into the sun, \"You know captain, life is like being at sea. It's rough, hard, and really expensive. To best the waves, all you have to rely on is your boat. Your boat is your home, and right now all I have is a crusty, leaky, studio-sized dingy in a turgid swamp in the Everglades. but with your help, I can sail out into the world in a mighty frigate and return with treasures that would make our fathers proud.\" <br/><br/>He nods, and places his hand on your shoulder.")
           }
           case (Amand) {
+            msg ("Feeling as if you gained her trust, you pretend to faint and let out a breathy, woeful sigh, \"I am impressed by your FABULOUS life. If only I could be as beautiful as your diamonds. Right now am nothing but a crumbly lump of coal. But even coal becomes diamonds with enough pressure. And so with your investment, I could becomes as elegant and show your brilliance like one of the diamonds on your necklace.<br/><br/>She fondles the diamonds around her neck and nods approvingly.")
           }
           case (Chrys) {
           }
